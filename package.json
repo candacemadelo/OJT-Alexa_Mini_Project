@@ -1,0 +1,28 @@
+{
+  "name": "ojt-alexa_mini_project",
+  "version": "1.0.0",
+  "description": "Create a web back-end server that will interface with Alexa.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/candacemadelo/OJT-Alexa_Mini_Project.git"
+  },
+  "author": "Vance Baritugo, Candace Madelo, Andre Maraton",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/candacemadelo/OJT-Alexa_Mini_Project/issues"
+  },
+  "homepage": "https://github.com/candacemadelo/OJT-Alexa_Mini_Project#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "ejs": "^3.1.3",
+    "express": "^4.17.1",
+    "express-sanitizer": "^1.0.5",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.9.17",
+    "request": "^2.88.2"
+  }
+}
