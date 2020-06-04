@@ -5,20 +5,14 @@ var bcrypt = require("bcryptjs");
 var userSchema = new mongoose.Schema({
 	firstName: String,
 	lastName: String,
-	email: {
-	    type: String,
-	    required: true,
-	    minlength: 1,
-	    trim: true, //get rid of whitespace
-	    unique: true, //note that the unique option is not a validator; we use mongoose-unique-validator to enforce it
-    },
+	email: String,
 	password: {
 		type: String,
 		required : true,
 		minlength: 8
 	}
 });
-
+ 
 //emails will be unique
 userSchema.plugin(uniqueValidator);
 

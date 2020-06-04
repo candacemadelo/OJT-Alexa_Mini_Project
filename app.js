@@ -2,11 +2,13 @@ var methodOverride  = require("method-override"),
     bodyParser      = require("body-parser"),
     mongoose        = require("mongoose"),
     express         = require("express"),
+    bcrypt          = require("bcryptjs");
+    cookieParser    = require('cookie-parser'),
     app				= express();
 
 
 //Database Connection
-mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false });
+mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
 
 //Models Configuration
 var	User  = require("./models/registration");
@@ -18,19 +20,18 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 //sets up the middleware for parsing the bodies and cookies off the requests
 app.use(bodyParser.json());
-app.use(cookieParse());
+app.use(cookieParser());
 
-// //function to check if the email address is valid
-// var isEmail = (email) => {
-// 	var emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+//function to check if the email address is valid
+const isEmail = (email) => {
+  if (typeof email !== 'string') {
+    return false;
+  }
 
-// 	if(typeof email != "string") {
-// 		return false;
-// 	}
+  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-// 	return emailRegex.test(email);
-
-// };
+  return emailRegex.test(email);
+};
 
 // home page
 app.get('/', function(req, res) {
@@ -40,21 +41,42 @@ app.get('/', function(req, res) {
 //Login Page
 app.post('/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    //find user in database
+    const {email, password } = req.body;
+    if (!isEmail(email)) {
+      return res.status(400).json({
+        errors: [
+          {
+            title: 'Invalid.',
+            detail: 'Email must be a valid email address.',
+          },
+        ],
+      });
+    }
+    if (typeof password !== 'string') {
+      return res.status(400).json({
+        errors: [
+          {
+            title: 'Invalid.',
+            detail: 'Password must be a string.',
+          },
+        ],
+      });
+    }
+    //queries database to find a user with the received email
     const user = await User.findOne({ email });
     if (!user) {
       throw new Error();
     }
-
     //using bcrypt to compare passwords
     const passwordValidated = await bcrypt.compare(password, user.password);
     if (!passwordValidated) {
       throw new Error();
     }
 
-    res.render("");
+    res.json({
+      title: 'Login Successful',
+      detail: 'Successfully validated user credentials',
+    });
   } catch (err) {
   	console.log(err);
   }
@@ -62,19 +84,34 @@ app.post('/login', async (req, res) => {
 
 
 // Registration page
-app.post("/register", function(req, res) {
-	User.create({
-		firstname: req.body.firstname,
-		lastname: req.body.lastname,
-		email: req.body.email,
-		password: req.body.password
-	}, function(err, user) {
-		if(err) {
-			console.log(err)
-		} else {
-			res.redirect("/login");
-		}
-	});
+app.post("/register", async (req, res) => {
+	try {
+	    const {firstName, lastName, email, password } = req.body;
+	    if (!isEmail(email)) {
+	      throw new Error('Email must be a valid email address.');
+	    }
+	    if (typeof password !== 'string') {
+	      throw new Error('Password must be a string.');
+	    }
+
+	    const user = new User({firstName, lastName, email, password });
+	    const saveUser = await user.save();
+
+	    res.status(201).json({
+	      title: 'User Registration Successful',
+	      detail: 'Successfully registered new user',
+	    });
+    } catch (err) {
+    res.status(400).json({
+      errors: [
+        {
+          title: 'Registration Error',
+          detail: 'Something went wrong during registration process.',
+          errorMessage: err.message,
+        },
+      ],
+    });
+  }
 });
 
 //localhost
