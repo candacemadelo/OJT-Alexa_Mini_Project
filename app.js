@@ -15,6 +15,7 @@ var	User  = require("./models/registration");
 
 // App Configuration
 app.set("view engine", "ejs");
+app.use(express.static(__dirname + "/public"));
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -35,7 +36,7 @@ const isEmail = (email) => {
 
 // home page
 app.get('/', function(req, res) {
-	res.render("");
+	res.render("/login");
 });
 
 //Login Page
