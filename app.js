@@ -11,7 +11,8 @@ var methodOverride  = require("method-override"),
 mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
 
 //Models Configuration
-var	User  = require("./models/registration");
+var	User    = require("./models/registration"),
+    Devices = require("./models/registration");
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -41,7 +42,7 @@ app.get('/', function(req, res) {
 
 // ROUTE registration page
 app.get('/registerpage', function(req, res) {
-	res.render("registration.ejs");
+	res.render("registration");
 });
 
 
@@ -116,6 +117,31 @@ app.post("/register", async (req, res) => {
       ],
     });
   }
+});
+
+
+
+//Add a Device List page
+app.post("/addDevice", async (req, res) => {
+	try{
+		const {power_status, temperature, setpoints,
+		       mode, endpointId, description, manufacturerName,
+		       friendlyName} = req.body;
+
+		 const deviceList = new Devices({power_status, temperature, setpoints,
+		                                 mode, endpointId, description, manufacturerName,
+		                                 friendlyName});
+		 const saveDeviceList = await deviceList.save();
+	} catch(err) {
+		res.status(400).json ({
+			errors: [
+				{
+					title: "Invalid",
+					detail: "Something went wrong during adding a device."
+				},
+			],
+		});
+	}
 });
 
 //localhost
