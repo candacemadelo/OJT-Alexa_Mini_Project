@@ -35,7 +35,7 @@ const isEmail = (email) => {
 
 // home page
 app.get('/', function(req, res) {
-	res.render("");
+	res.render("login");
 });
 
 //Login Page
@@ -65,7 +65,8 @@ app.post('/login', async (req, res) => {
     //queries database to find a user with the received email
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error();
+      // throw new Error();
+      res.render("home");
     }
     //using bcrypt to compare passwords
     const passwordValidated = await bcrypt.compare(password, user.password);
