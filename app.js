@@ -34,10 +34,16 @@ const isEmail = (email) => {
   return emailRegex.test(email);
 };
 
-// home page
+// login page
 app.get('/', function(req, res) {
 	res.render("login");
 });
+
+// ROUTE registration page
+app.get('/registerpage', function(req, res) {
+	res.render("registration.ejs");
+});
+
 
 //Login Page
 app.post('/login', async (req, res) => {
@@ -66,8 +72,8 @@ app.post('/login', async (req, res) => {
     //queries database to find a user with the received email
     const user = await User.findOne({ email });
     if (!user) {
-      // throw new Error();
-      res.render("home");
+      throw new Error();
+      // res.render("home");
     }
     //using bcrypt to compare passwords
     const passwordValidated = await bcrypt.compare(password, user.password);
@@ -75,10 +81,7 @@ app.post('/login', async (req, res) => {
       throw new Error();
     }
 
-    res.json({
-      title: 'Login Successful',
-      detail: 'Successfully validated user credentials',
-    });
+    res.render("home");
 
   } catch (err) {
   	console.log(err);
@@ -100,10 +103,7 @@ app.post("/register", async (req, res) => {
 	    const user = new User({firstName, lastName, email, password });
 	    const saveUser = await user.save();
 
-	    res.status(201).json({
-	      title: 'User Registration Successful',
-	      detail: 'Successfully registered new user',
-	    });
+	    res.render("login");
 
     } catch (err) {
     res.status(400).json({
