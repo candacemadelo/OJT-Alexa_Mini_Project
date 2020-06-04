@@ -1,17 +1,28 @@
 <%- include("partials/header") %>
-<br>
-<div class="parallax-container">
+<div class="container" style="padding-top: 20px;">
   <div class="row">
     <div class="col s4"></div>
-    <div class="col s4 z-depth-5" style="background-size: cover; background-image: url('https://www.99images.com/photos/wallpapers/3d-abstract/minimalist-phoneandroid-iphone-desktop-hd-backgrounds-wallpapers-1080p-4k-jgsnf.png?v=1577323166');">
+    <div class="col s4 z-depth-5" style="background-size: cover; background-repeat: no-repeat; background-image: url('https://i.pinimg.com/originals/59/3f/a2/593fa20d2128f90ed60b29e268a4d082.jpg');">
       <div class="card" >
         <div class="card-image">
-          <form class="col s12" action="/login" method="POST">
+          <div class="col s12" style="height: 85px;"></div>
+          <form class="col s12" action="/register" method="POST">
             <div class="row">
               <div class="input-field col s12">
+                <i class="material-icons prefix">person</i>
+                <input id="icon_prefix" type="text" class="validate" name="firstName">
+                <label for="icon_prefix">First name</label>
+              </div>
+              <div class="input-field col s12">
+                <i class="material-icons prefix">person</i>
+                <input id="icon_prefix" type="text" class="validate" name="lastName">
+                <label for="icon_prefix">Lastname</label>
+              </div>
+              <div class="input-field col s12">
                 <i class="material-icons prefix">email</i>
-                <input id="icon_prefix" type="text" class="validate" name="email">
+                <input id="icon_prefix" type="email" class="validate" name="email">
                 <label for="icon_prefix">Email</label>
+                <span class="helper-text" data-error="wrong" data-success="right"></span>
               </div>
               <div class="input-field col s12">
                 <i class="material-icons prefix">lock</i>
@@ -20,17 +31,19 @@
               </div>
             </div>
             <div class="row">
-              <button class=" btn waves-effect waves-light btn-large col s12" type="submit" name="action">REGISTER
-                <i class="material-icons right">person_add</i>
-              </button>
-              
+                <div class="col s2"></div>
+                <button class=" btn waves-effect waves-light btn-large col s8" type="submit" name="action">REGISTER
+                    <i class="material-icons right">person_add</i>
+                </button>
+                <div class="col s2"></div>
             </div>
             <div class="row">
-              <button class="btn waves-effect waves-light btn-large col s12" type="submit" name="action">LOGIN
-                <i class="material-icons right">lock_open</i>
-              </button>
+                <div class="col s2"></div>
+                    <a class="btn waves-effect waves-light btn-large col s8 center-text" href="/"><i class="material-icons left">arrow_back</i>BACK</a>
+                <div class="col s2"></div>
             </div>
           </form>
+          <div class="col s12" style="height: 60px;"></div>
         </div>
       </div>
     </div>
