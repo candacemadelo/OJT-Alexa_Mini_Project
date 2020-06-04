@@ -124,11 +124,11 @@ app.post("/register", async (req, res) => {
 //Add a Device List page
 app.post("/addDevice", async (req, res) => {
 	try{
-		const {power_status, temperature, setpoints,
+		const {userId, power_status, temperature, setpoints,
 		       mode, endpointId, description, manufacturerName,
 		       friendlyName} = req.body;
 
-		 const deviceList = new Devices({power_status, temperature, setpoints,
+		 const deviceList = new Devices({userId, power_status, temperature, setpoints,
 		                                 mode, endpointId, description, manufacturerName,
 		                                 friendlyName});
 		 const saveDeviceList = await deviceList.save();
