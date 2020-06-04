@@ -15,7 +15,7 @@ var	User  = require("./models/registration");
 
 // App Configuration
 app.set("view engine", "ejs");
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + "/views"));
 app.use(methodOverride("_method"));
 app.use(bodyParser.urlencoded({extended:true}));
 
@@ -36,7 +36,7 @@ const isEmail = (email) => {
 
 // home page
 app.get('/', function(req, res) {
-	res.render("/login");
+	res.render("login");
 });
 
 //Login Page
@@ -78,6 +78,7 @@ app.post('/login', async (req, res) => {
       title: 'Login Successful',
       detail: 'Successfully validated user credentials',
     });
+
   } catch (err) {
   	console.log(err);
   }
@@ -102,6 +103,7 @@ app.post("/register", async (req, res) => {
 	      title: 'User Registration Successful',
 	      detail: 'Successfully registered new user',
 	    });
+
     } catch (err) {
     res.status(400).json({
       errors: [
