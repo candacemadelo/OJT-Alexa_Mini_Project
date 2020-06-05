@@ -13,6 +13,7 @@ mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, u
 //Models Configuration
 var	User    = require("./models/registration"),
     Devices = require("./models/registration");
+    Session = require("./models/sessionToken");
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -35,6 +36,15 @@ const isEmail = (email) => {
   return emailRegex.test(email);
 };
 
+//initializing a new session and save data to db
+const initializeSession = async (userInfo) => {
+	const token = await Session.generateToken();
+	const session = new Session({token, userInfo});
+	await session.save();
+	return session;
+};
+
+
 // login page
 app.get('/', function(req, res) {
 	res.render("login");
@@ -54,7 +64,7 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            title: 'Invalid.',
+            message: 'Invalid.',
             detail: 'Email must be a valid email address.',
           },
         ],
@@ -64,7 +74,7 @@ app.post('/login', async (req, res) => {
       return res.status(400).json({
         errors: [
           {
-            title: 'Invalid.',
+            message: 'Invalid.',
             detail: 'Password must be a string.',
           },
         ],
@@ -82,11 +92,36 @@ app.post('/login', async (req, res) => {
       throw new Error();
     }
 
-    res.render("home");
+    const userInfo = user._id;
+    const session = await initializeSession(userInfo);
 
-  } catch (err) {
-  	console.log(err);
-  }
+    res.cookie('token', session.token, {
+    	httpOnly: true,
+        sameSite: true,
+        maxAge:  2 * 60 * 60 * 1000, // 2 hours,
+        secure: process.env.NODE_ENV === 'production',
+
+    }).status(201);
+
+	const detailsToken = await Session.find({}).populate('userInfo').exec();
+	
+	 res.json({
+	 	message: 'Authentication Successful!',
+	 	detail: 'Successfully authenticated user',
+	 	detailsToken,
+	 }) 
+
+    } catch (err) {
+    res.status(400).json({
+	      errors: [
+	        {
+	          message: 'Login Error',
+	          detail: 'Something went wrong during login process.',
+	          errorMessage: err.message,
+	        },
+	      ],
+	    });
+	}
 });
 
 
@@ -103,14 +138,27 @@ app.post("/register", async (req, res) => {
 
 	    const user = new User({firstName, lastName, email, password });
 	    const saveUser = await user.save();
+	    const userInfo = saveUser._id;
+	    const session = await initializeSession(userInfo);
 
-	    res.render("login");
+	    res.cookie('token', session.token, {
+	    	httpOnly: true,
+	        sameSite: true,
+	        maxAge:  2 * 60 * 60 * 1000, // 2 hours
+	        secure: process.env.NODE_ENV === 'production',
+	    }).status(201) .json({
+	    	message: 'User Registration Successful!',
+	    	detail: 'You have sucessfully registered a new user.'
+	    });
+
+
+	    //res.render("login");
 
     } catch (err) {
     res.status(400).json({
       errors: [
         {
-          title: 'Registration Error',
+          message: 'Registration Error',
           detail: 'Something went wrong during registration process.',
           errorMessage: err.message,
         },
