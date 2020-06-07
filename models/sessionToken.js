@@ -23,6 +23,7 @@ var mongoose        = require('mongoose'),
     default: 'valid',
   },
 });
+ 
 // generate a unique token
 sessionSchema.statics.generateToken = function() {
   return new Promise((resolve, reject) => {

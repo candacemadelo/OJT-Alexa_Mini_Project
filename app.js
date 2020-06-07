@@ -4,6 +4,7 @@ var methodOverride  = require("method-override"),
     express         = require("express"),
     bcrypt          = require("bcryptjs");
     cookieParser    = require('cookie-parser'),
+    uniqid			= require('uniqid'),
     app				= express();
 
 
@@ -146,7 +147,7 @@ app.post("/register", async (req, res) => {
 	        sameSite: true,
 	        maxAge:  2 * 60 * 60 * 1000, // 2 hours
 	        secure: process.env.NODE_ENV === 'production',
-	    }).status(201) .json({
+	    }).status(201).json({
 	    	message: 'User Registration Successful!',
 	    	detail: 'You have sucessfully registered a new user.'
 	    });
@@ -171,21 +172,34 @@ app.post("/register", async (req, res) => {
 
 //Add a Device List page
 app.post("/addDevice", async (req, res) => {
+
 	try{
+		const endpointId = uniqid();
 		const {userId, power_status, temperature, setpoints,
-		       mode, endpointId, description, manufacturerName,
+		       mode, description, manufacturerName,
 		       friendlyName} = req.body;
 
 		 const deviceList = new Devices({userId, power_status, temperature, setpoints,
 		                                 mode, endpointId, description, manufacturerName,
 		                                 friendlyName});
 		 const saveDeviceList = await deviceList.save();
+		 const addDeviceList = await Devices.find({}).exec();
+
+		 res.json({
+		 	message: 'Add Device Successful!',
+		 	detail: "You have Successfully added a new device",
+		 	addDeviceList,
+		 })
+
+
+
 	} catch(err) {
 		res.status(400).json ({
 			errors: [
 				{
 					title: "Invalid",
-					detail: "Something went wrong during adding a device."
+					detail: "Something went wrong during adding a device.",
+					errorMessage: err.message,
 				},
 			],
 		});

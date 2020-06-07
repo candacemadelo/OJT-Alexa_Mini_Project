@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require('mongoose-unique-validator');
 var bcrypt = require("bcryptjs");
+const passportLocalMongoose = require("passport-local-mongoose");
 
 var userSchema = new mongoose.Schema({
 	firstName: String,
@@ -15,6 +16,7 @@ var userSchema = new mongoose.Schema({
  
 //emails will be unique
 userSchema.plugin(uniqueValidator);
+userSchema.plugin(passportLocalMongoose);
 
 //this function will be called before a document is saved
 userSchema.pre('save', function(next) {
