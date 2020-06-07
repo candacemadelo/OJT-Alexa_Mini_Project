@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require('mongoose-unique-validator');
 var bcrypt = require("bcryptjs");
-const passportLocalMongoose = require("passport-local-mongoose");
+var passportLocalMongoose = require("passport-local-mongoose");
 
 var userSchema = new mongoose.Schema({
 	firstName: String,

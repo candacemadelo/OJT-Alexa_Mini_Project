@@ -13,7 +13,7 @@ mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, u
 
 //Models Configuration
 var	User    = require("./models/registration"),
-    Devices = require("./models/registration");
+    Devices = require("./models/devices");
     Session = require("./models/sessionToken");
 
 // App Configuration
@@ -174,16 +174,17 @@ app.post("/register", async (req, res) => {
 app.post("/addDevice", async (req, res) => {
 
 	try{
-		const endpointId = uniqid();
-		const {userId, power_status, temperature, setpoints,
+		const uniq = uniqid();
+		const {power_status, temperature, setpoints,
 		       mode, description, manufacturerName,
 		       friendlyName} = req.body;
 
-		 const deviceList = new Devices({userId, power_status, temperature, setpoints,
-		                                 mode, endpointId, description, manufacturerName,
-		                                 friendlyName});
-		 const saveDeviceList = await deviceList.save();
-		 const addDeviceList = await Devices.find({}).exec();
+		const deviceList = new Devices({power_status, temperature, setpoints,
+		       mode, endpointId:uniq, description, manufacturerName,
+		       friendlyName});
+
+		const saveDeviceList = await deviceList.save();
+		const addDeviceList = await Devices.find({}).exec();
 
 		 res.json({
 		 	message: 'Add Device Successful!',
@@ -197,12 +198,14 @@ app.post("/addDevice", async (req, res) => {
 		res.status(400).json ({
 			errors: [
 				{
-					title: "Invalid",
+					message: "Invalid",
 					detail: "Something went wrong during adding a device.",
 					errorMessage: err.message,
 				},
 			],
 		});
+
+		console.log(err);
 	}
 });
 
