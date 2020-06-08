@@ -12,14 +12,10 @@ var validateEmail = function(email) {
 
 
 //to check the limit of user input for names
-var isLength = function(val) {
-  return (val && 3 < val.length >- 35);
+var isLength = function(string) {
+  return (string && 3 < string.length >- 35);
 };
 
-// var isNum = function(val) {
-//   var numregex = /^[0-9]+$/;
-//   return numregex.test(val);
-// }
 
 //user inputs for names must not include numbers
 var onlyLettersAllow = function(string) {
