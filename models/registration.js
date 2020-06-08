@@ -2,11 +2,45 @@ var mongoose = require("mongoose");
 var uniqueValidator = require('mongoose-unique-validator');
 var bcrypt = require("bcryptjs");
 var passportLocalMongoose = require("passport-local-mongoose");
+var validate = require('mongoose-validator');
 
+//to chech if email syntax is valid
+var validateEmail = function(email) {
+    var re = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+    return re.test(email);
+};
+
+
+//to check the limit of user input for names
+var isLength = function(val) {
+  return (val && val.length > 5);
+};
+
+
+//user inputs for names must not include numbers
+var onlyLettersAllow = function(string) {
+    var myRegxp = /^[a-zA-Z]+$/i;
+    return  myRegxp.test(string);
+};
+
+//validator for user
+var  nameValidator = [
+    {validator: isLength, msg: 'Input is too short.', httpStatus: 400},
+    {validator: onlyLettersAllow, msg: 'Letters allowed only.', httpStatus: 400}
+];
+
+
+//validator for email
+var emailValidator = [
+    {validator: validateEmail, msg: 'Please fill  valid email address.', httpStatus: 400},
+];
+
+
+//user schema plus model
 var userSchema = new mongoose.Schema({
-	firstName: String,
-	lastName: String,
-	email: String,
+	firstName: {type: String, required: true, validate: nameValidator},
+	lastName: {type: String, required: true, validate: nameValidator},
+	email: {type: String, required: true, validate: emailValidator},
 	password: {
 		type: String,
 		required : true,
@@ -38,6 +72,5 @@ userSchema.pre('save', function(next) {
     })
     .catch((err) => next(err));
 });
-
 
 module.exports = mongoose.model("User", userSchema);

@@ -26,17 +26,6 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-//function to check if the email address is valid
-const isEmail = (email) => {
-  if (typeof email !== 'string') {
-    return false;
-  }
-
-  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-  return emailRegex.test(email);
-};
-
 //initializing a new session and save data to db
 const initializeSession = async (userInfo) => {
 	const token = await Session.generateToken();
@@ -61,26 +50,6 @@ app.get('/registerpage', function(req, res) {
 app.post('/login', async (req, res) => {
   try {
     const {email, password } = req.body;
-    if (!isEmail(email)) {
-      return res.status(400).json({
-        errors: [
-          {
-            message: 'Invalid.',
-            detail: 'Email must be a valid email address.',
-          },
-        ],
-      });
-    }
-    if (typeof password !== 'string') {
-      return res.status(400).json({
-        errors: [
-          {
-            message: 'Invalid.',
-            detail: 'Password must be a string.',
-          },
-        ],
-      });
-    }
     //queries database to find a user with the received email
     const user = await User.findOne({ email });
     if (!user) {
@@ -130,12 +99,6 @@ app.post('/login', async (req, res) => {
 app.post("/register", async (req, res) => {
 	try {
 	    const {firstName, lastName, email, password } = req.body;
-	    if (!isEmail(email)) {
-	      throw new Error('Email must be a valid email address.');
-	    }
-	    if (typeof password !== 'string') {
-	      throw new Error('Password must be a string.');
-	    }
 
 	    const user = new User({firstName, lastName, email, password });
 	    const saveUser = await user.save();
