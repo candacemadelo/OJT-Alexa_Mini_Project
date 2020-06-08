@@ -13,9 +13,13 @@ var validateEmail = function(email) {
 
 //to check the limit of user input for names
 var isLength = function(val) {
-  return (val && val.length > 5);
+  return (val && 3 < val.length >- 35);
 };
 
+// var isNum = function(val) {
+//   var numregex = /^[0-9]+$/;
+//   return numregex.test(val);
+// }
 
 //user inputs for names must not include numbers
 var onlyLettersAllow = function(string) {
@@ -25,8 +29,9 @@ var onlyLettersAllow = function(string) {
 
 //validator for user
 var  nameValidator = [
-    {validator: isLength, msg: 'Input is too short.', httpStatus: 400},
-    {validator: onlyLettersAllow, msg: 'Letters allowed only.', httpStatus: 400}
+  // {validator: isNum, msg: 'Input must be String!.', httpStatus: 400},
+  {validator: isLength, msg: 'Input is too short.', httpStatus: 400},
+  {validator: onlyLettersAllow, msg: 'Letters allowed only.', httpStatus: 400}
 ];
 
 
