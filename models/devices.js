@@ -4,16 +4,15 @@ var uniqid   = require("uniqid");
 var deviceSchema = new mongoose.Schema({
 	userId: {
 	    type: mongoose.Schema.Types.ObjectId,
-	    ref: "User",
-	    required: true
+	    ref: "User"
 	 }, 
-	power_status: Number,
-	temperature: Number,
-	setpoints: Number,
-	endpointId: String,
-	description: String,
-	manufacturerName: String, 
-	friendlyName: String
+	power_status: {type: Number, required: true},
+	temperature: {type: Number, required: true},
+	setpoints: {type: Number, required: true},
+	endpointId: {type: String, required: true},
+	description: {type: String, required: true},
+	manufacturerName: {type: String, required: true},
+	friendlyName: {type: String, required: true}
 
 });
 

@@ -33,7 +33,7 @@ var  nameValidator = [
 
 //validator for email
 var emailValidator = [
-    {validator: validateEmail, msg: 'Please fill  valid email address.', httpStatus: 400},
+    {validator: validateEmail, msg: 'Please fill valid email address.', httpStatus: 400},
 ];
 
 
@@ -41,7 +41,7 @@ var emailValidator = [
 var userSchema = new mongoose.Schema({
 	firstName: {type: String, required: true, validate: nameValidator},
 	lastName: {type: String, required: true, validate: nameValidator},
-	email: {type: String, required: true, validate: emailValidator},
+	email: {type: String, required: true, validate: emailValidator, uniqueCaseInsensitive: true},
 	password: {
 		type: String,
 		required : true,
@@ -50,8 +50,8 @@ var userSchema = new mongoose.Schema({
 });
  
 //emails will be unique
-userSchema.plugin(uniqueValidator);
-userSchema.plugin(passportLocalMongoose);
+//userSchema.plugin(uniqueValidator, {type: 'mongoose-unique-validator'});
+// userSchema.plugin(passportLocalMongoose);
 
 //this function will be called before a document is saved
 userSchema.pre('save', function(next) {
@@ -73,5 +73,14 @@ userSchema.pre('save', function(next) {
     })
     .catch((err) => next(err));
 });
+
+
+
+//this display checks whether an email already exists
+userSchema.path('email').validate(async (value) => {
+  const emailCount = await mongoose.models.User.countDocuments({email: value });
+  return !emailCount;
+}, 'The specified email address is already in use.');
+
 
 module.exports = mongoose.model("User", userSchema);

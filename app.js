@@ -26,6 +26,18 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
+
+//if valid email address
+const isEmail = (email) => {
+  if (typeof email !== 'string') {
+    return false;
+  }
+  const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+
+  return emailRegex.test(email);
+};
+
+
 //initializing a new session and save data to db
 const initializeSession = async (userInfo) => {
 	const token = await Session.generateToken();
@@ -47,23 +59,56 @@ app.get('/registerpage', function(req, res) {
 
 
 //Login Page
-app.post('/login', async (req, res) => {
+app.post('/api/v1/user/login', async (req, res) => {
   try {
     const {email, password } = req.body;
+
+    if (!isEmail(email)) {
+      return res.status(400).json({
+        errors: [
+          {
+            message: 'Bad Request',
+            detail: 'Email must be a valid email address',
+          },
+        ],
+      });
+    }else if (typeof email !== 'string') {
+    	return res.status(400).json({
+        errors: [
+          {
+            message: 'Bad Request',
+            detail: 'Email must be a string',
+          },
+        ],
+      });
+    }
+
+    if (typeof password !== 'string') {
+      return res.status(400).json({
+        errors: [
+          {
+            message: 'Bad Request',
+            detail: 'Password must be a string',
+          },
+        ],
+      });
+    }
+
     //queries database to find a user with the received email
     const user = await User.findOne({ email });
     if (!user) {
-      throw new Error();
+      throw new Error("User does not exist.");
       // res.render("home");
     }
     //using bcrypt to compare passwords
     const passwordValidated = await bcrypt.compare(password, user.password);
     if (!passwordValidated) {
-      throw new Error();
+      throw new Error("Password does not match.");
     }
 
     const userInfo = user._id;
     const session = await initializeSession(userInfo);
+    const sessionId = session._id;
 
     res.cookie('token', session.token, {
     	httpOnly: true,
@@ -73,20 +118,25 @@ app.post('/login', async (req, res) => {
 
     }).status(201);
 
-	const detailsToken = await Session.find({}).populate('userInfo').exec();
+	const data = await Session.find({_id:sessionId}).populate("userInfo").exec();
 	
-	 res.json({
-	 	message: 'Authentication Successful!',
-	 	detail: 'Successfully authenticated user',
-	 	detailsToken,
-	 }) 
+	res.json({
+	 	"success": true,
+	 	"message": 'User logged in successfully.',
+	 	data
+	 });
 
     } catch (err) {
     res.status(400).json({
 	      errors: [
 	        {
-	          message: 'Login Error',
-	          detail: 'Something went wrong during login process.',
+	          "success" : false, 
+	          "message": 'Invalid email or password.',
+	          "data" :{
+	          		"details": [
+	          			req.body
+	          		]
+	          	},
 	          errorMessage: err.message,
 	        },
 	      ],
@@ -96,7 +146,7 @@ app.post('/login', async (req, res) => {
 
 
 // Registration page
-app.post("/register", async (req, res) => {
+app.post("/api/v1/user/register", async (req, res) => {
 	try {
 	    const {firstName, lastName, email, password } = req.body;
 
@@ -104,6 +154,7 @@ app.post("/register", async (req, res) => {
 	    const saveUser = await user.save();
 	    const userInfo = saveUser._id;
 	    const session = await initializeSession(userInfo);
+	    const currentUser = await User.find({_id: userInfo}).exec();
 
 	    res.cookie('token', session.token, {
 	    	httpOnly: true,
@@ -111,8 +162,12 @@ app.post("/register", async (req, res) => {
 	        maxAge:  2 * 60 * 60 * 1000, // 2 hours
 	        secure: process.env.NODE_ENV === 'production',
 	    }).status(201).json({
-	    	message: 'User Registration Successful!',
-	    	detail: 'You have sucessfully registered a new user.'
+	    	"success" : true,
+	    	"message": 'Successfully Registered!',
+	    	"details": 'User has been saved successfully.',
+	    	"data": {
+	    		"registerUser": currentUser
+	    	}
 	    });
 
 
@@ -122,8 +177,14 @@ app.post("/register", async (req, res) => {
     res.status(400).json({
       errors: [
         {
-          message: 'Registration Error',
-          detail: 'Something went wrong during registration process.',
+          "success": false,
+          "message": 'Registration Failed',
+          "Error_code": 1308,
+          "data": {
+          	"registerUser": [
+          		req.body
+          	]
+          },
           errorMessage: err.message,
         },
       ],
@@ -134,7 +195,7 @@ app.post("/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/addDevice", async (req, res) => {
+app.post("/api/v1/device/addDevice", async (req, res) => {
 
 	try{
 		const uniq = uniqid();
@@ -147,22 +208,23 @@ app.post("/addDevice", async (req, res) => {
 		       friendlyName});
 
 		const saveDeviceList = await deviceList.save();
-		const addDeviceList = await Devices.find({}).exec();
+		const data = await Devices.find({}).exec();
 
 		 res.json({
-		 	message: 'Add Device Successful!',
-		 	detail: "You have Successfully added a new device",
-		 	addDeviceList,
+		 	"success": true,
+		 	"message": 'Add Device Successful!',
+		 	data,
 		 })
-
-
 
 	} catch(err) {
 		res.status(400).json ({
 			errors: [
 				{
-					message: "Invalid",
-					detail: "Something went wrong during adding a device.",
+					"success": false,
+					"message": "Adding a new device failed.",
+					"data" : {
+						"data": [req.body]
+					},
 					errorMessage: err.message,
 				},
 			],

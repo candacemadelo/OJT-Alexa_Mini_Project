@@ -4,24 +4,21 @@ var mongoose        = require('mongoose'),
 
 
  var sessionSchema = new mongoose.Schema({
+  status: {
+    type: String,
+    enum: ['valid', 'expired'],
+    default: 'valid',
+  },
   token: {
     type: String,
     required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
   },
   userInfo: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "User"
   },
-  status: {
-    type: String,
-    enum: ['valid', 'expired'],
-    default: 'valid',
-  },
+
 });
  
 // generate a unique token
