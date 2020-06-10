@@ -10,7 +10,8 @@ var methodOverride  = require("method-override"),
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 //Database Connection
-mongoose.connect("mongodb+srv://dre123:6tyt6wxrwqjmv3ip@cluster0-ztdrl.mongodb.net/projectdb?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
+mongoose.connect("mongodb+srv://dre123:6TyT6wxrwqjMv3iP@cluster0-ztdrl.mongodb.net/projectdb?retryWrites=true&w=majority", 
+	             { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
 
 //Models Configuration
 var	User    = require("./models/registration"),
@@ -157,15 +158,17 @@ app.post("/api/v1/user/register", async (req, res) => {
 	    const user = new User({firstName, lastName, email, password });
 	    const saveUser = await user.save();
 	    const userInfo = saveUser._id;
-	    const session = await initializeSession(userInfo);
+	    //const session = await initializeSession(userInfo);
 	    const currentUser = await User.find({_id: userInfo}).exec();
 
-	    res.cookie('token', session.token, {
-	    	httpOnly: true,
-	        sameSite: true,
-	        maxAge:  2 * 60 * 60 * 1000, // 2 hours
-	        secure: process.env.NODE_ENV === 'production',
-	    }).status(201).json({
+	    // res.cookie('token', session.token, {
+	    // 	httpOnly: true,
+	    //     sameSite: true,
+	    //     maxAge:  2 * 60 * 60 * 1000, // 2 hours
+	    //     secure: process.env.NODE_ENV === 'production',
+	    // })
+
+	    res.status(201).json({
 	    	"success" : true,
 	    	"message": 'Successfully Registered!',
 	    	"details": 'User has been saved successfully.',
@@ -199,21 +202,22 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/api/v1/device/addDevice/user_id", async (req, res) => {
+app.post("/api/v1/device/addDevice/token", async (req, res) => {
 
 	try{
-		const getUserId = await Devices.findOne(req.params.user_id).exec();
+
 		const uniq = uniqid();
 		const {power_status, temperature, setpoints,
 		       mode, description, manufacturerName,
 		       friendlyName} = req.body;
 
-		const deviceList = new Devices({userId: getUserId, power_status, temperature, setpoints,
+		const deviceList = new Devices({power_status, temperature, setpoints,
 		       mode, endpointId:uniq, description, manufacturerName,
 		       friendlyName});
 
 		const saveDeviceList = await deviceList.save();
-		const data = await Devices.find({}).exec();
+		const deviceId = saveDeviceList._id;
+		const data = await Devices.find({_id:deviceId}).exec();
 
 		 res.json({
 		 	"success": true,
