@@ -5,9 +5,10 @@ var methodOverride  = require("method-override"),
     bcrypt          = require("bcryptjs");
     cookieParser    = require('cookie-parser'),
     uniqid			= require('uniqid'),
+    jwt				= require('jsonwebtoken'),
     app				= express();
 
-
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
 //Database Connection
 mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
 
@@ -26,7 +27,8 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
 app.use(cookieParser());
 
-
+//functions
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
 //if valid email address
 const isEmail = (email) => {
   if (typeof email !== 'string') {
@@ -47,6 +49,8 @@ const initializeSession = async (userInfo) => {
 };
 
 
+//routes
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
 // login page
 app.get('/', function(req, res) {
 	res.render("login");
@@ -195,15 +199,16 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/api/v1/device/addDevice", async (req, res) => {
+app.post("/api/v1/device/addDevice/user_id", async (req, res) => {
 
 	try{
+		const getUserId = await Devices.findOne(req.params.user_id).exec();
 		const uniq = uniqid();
 		const {power_status, temperature, setpoints,
 		       mode, description, manufacturerName,
 		       friendlyName} = req.body;
 
-		const deviceList = new Devices({power_status, temperature, setpoints,
+		const deviceList = new Devices({userId: getUserId, power_status, temperature, setpoints,
 		       mode, endpointId:uniq, description, manufacturerName,
 		       friendlyName});
 
@@ -234,7 +239,44 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 	}
 });
 
+
+//Get a Device List page
+app.post("/api/v1/device/getDevice", async (req, res) => {
+
+	try{
+		const token = req.body;
+		const device = await Devices.find({}).exec();
+
+		res.json({
+			"success" : true,
+			"message" : "Found data.",
+			"data":[
+				device
+			]
+		});
+
+	} catch(err) {
+		res.status(400).json ({
+			errors: [
+				{
+					"success": false,
+					"message": "No data found.",
+					"data" : {
+						"token": [req.body]
+					},
+					errorMessage: err.message,
+				},
+			],
+		});
+
+		console.log(err);
+	}
+});
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 //localhost
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------
 app.listen(3000, process.env.IP, function() {
    console.log("***** Server has started on port 3000. *****");
 });
