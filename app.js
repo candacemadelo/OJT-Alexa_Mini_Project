@@ -10,7 +10,7 @@ var methodOverride  = require("method-override"),
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 //Database Connection
-mongoose.connect("mongodb://localhost/alexa_project", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
+mongoose.connect("mongodb+srv://dre123:6tyt6wxrwqjmv3ip@cluster0-ztdrl.mongodb.net/projectdb?retryWrites=true&w=majority", { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
 
 //Models Configuration
 var	User    = require("./models/registration"),
