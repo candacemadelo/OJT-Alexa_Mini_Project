@@ -202,22 +202,22 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/api/v1/device/addDevice/token", async (req, res) => {
+app.post("/api/v1/device/addDevice/:token", async (req, res) => {
+	var deviceToken = req.params.token;
 
 	try{
-
 		const uniq = uniqid();
 		const {power_status, temperature, setpoints,
 		       mode, description, manufacturerName,
 		       friendlyName} = req.body;
 
-		const deviceList = new Devices({power_status, temperature, setpoints,
+		const deviceList = new Devices({tokenId: deviceToken, power_status, temperature, setpoints,
 		       mode, endpointId:uniq, description, manufacturerName,
 		       friendlyName});
 
 		const saveDeviceList = await deviceList.save();
 		const deviceId = saveDeviceList._id;
-		const data = await Devices.find({_id:deviceId}).exec();
+		const data = await Devices.find({_id: deviceId}).exec();
 
 		 res.json({
 		 	"success": true,
@@ -245,11 +245,11 @@ app.post("/api/v1/device/addDevice/token", async (req, res) => {
 
 
 //Get a Device List page
-app.post("/api/v1/device/getDevice", async (req, res) => {
+app.get("/api/v1/device/getDevice/:token", async (req, res) => {
 
 	try{
-		const token = req.body;
-		const device = await Devices.find({}).exec();
+		const getToken = req.params.token;
+		const device = await Devices.find({tokenId: getToken}, {}).exec();
 
 		res.json({
 			"success" : true,
@@ -271,6 +271,33 @@ app.post("/api/v1/device/getDevice", async (req, res) => {
 					errorMessage: err.message,
 				},
 			],
+		});
+
+		console.log(err);
+	}
+});
+
+//Get device status
+app.get("/api/v1/device/deviceState/:id", async (req, res) => {
+		var deviceID = req.params.id;
+	try{
+		const deviceStatus = await Devices.findById(deviceID, {}).exec();
+		res.json({
+			message: 'Device found!',
+			detail: "You have Successfully added a new device",
+			deviceStatus
+		});
+		console.log(deviceStatus);
+
+	} catch(err) {
+		res.status(400).json ({
+			errors: [
+				{
+					success: true,
+					message: "Failed retrieving data.",
+					errorMessage: err.message
+				}
+			]
 		});
 
 		console.log(err);
