@@ -206,6 +206,7 @@ app.post("/api/v1/device/addDevice/:token", async (req, res) => {
 	var deviceToken = req.params.token;
 
 	try{
+
 		const uniq = uniqid();
 		const {power_status, temperature, setpoints,
 		       mode, description, manufacturerName,
@@ -249,14 +250,59 @@ app.get("/api/v1/device/getDevice/:token", async (req, res) => {
 
 	try{
 		const getToken = req.params.token;
-		const device = await Devices.find({tokenId: getToken}, {}).exec();
+		const endpoints = await Devices.find({tokenId: getToken}, {}).exec();
 
 		res.json({
 			"success" : true,
 			"message" : "Found data.",
-			"data":[
-				device
-			]
+			"data": {
+				endpoints,
+				"displayCategories": ["THERMOSTAT", "TEMPERATURE_SENSOR"],
+                "capabilities":
+                [
+                    {
+                        "type": "AlexaInterface",
+                        "interface": "Alexa.ThermostatController",
+                        "version": "3",
+                        "properties": {
+                        "supported": [
+                            {
+                                "name": "targetSetpoint"
+                            },
+                            {
+                                "name": "thermostatMode"
+                            }
+                        ],
+                        "proactivelyReported": true,
+                        "retrievable": true
+                      },
+                      "configuration": {
+                            "supportedModes": ["OFF", "COOL", "HEAT"],
+                            "supportsScheduling": false
+                      }
+                    },
+                    {
+                      "type": "AlexaInterface",
+                      "interface": "Alexa.PowerController",
+                      "version": "3",
+                      "properties": {
+                        "supported": [
+                          {
+                            "name": "powerState"
+                          }
+                        ],
+                        "proactivelyReported": true,
+                        "retrievable": true
+                      }
+                    },
+                    {
+                      "type": "AlexaInterface",
+                      "interface": "Alexa",
+                      "version": "3"
+                    }
+                ]
+			}
+			
 		});
 
 	} catch(err) {

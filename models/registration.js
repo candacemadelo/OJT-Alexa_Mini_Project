@@ -78,7 +78,7 @@ userSchema.pre('save', function(next) {
 
 //this display checks whether an email already exists
 userSchema.path('email').validate(async (value) => {
-  const emailCount = await mongoose.models.User.countDocuments({email: value });
+  const emailCount = await mongoose.models.user.countDocuments({email: value });
   return !emailCount;
 }, 'The specified email address is already in use.');
 
