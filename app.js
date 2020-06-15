@@ -17,6 +17,7 @@ mongoose.connect("mongodb+srv://dre123:6TyT6wxrwqjMv3iP@cluster0-ztdrl.mongodb.n
 var	User    = require("./models/registration"),
     Devices = require("./models/devices");
     Session = require("./models/sessionToken");
+    AccessToken = require("./models/oauth");
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -113,7 +114,9 @@ app.post('/api/v1/user/login', async (req, res) => {
 
     const userInfo = user._id;
     const session = await initializeSession(userInfo);
-    const sessionId = session._id;
+    //const session = new Session({status, token, userInfo});
+    const saveSession = await session.save();
+    const sessionId = saveSession._id;
 
     res.cookie('token', session.token, {
     	httpOnly: true,
@@ -206,18 +209,16 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/api/v1/device/addDevice/:token", async (req, res) => {
-	var deviceToken = req.params.token;
-
+app.post("/api/v1/device/addDevice", async (req, res) => {
+	const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
+	const infoToken = "" + deviceToken.accessToken;
 	try{
 
 		const uniq = uniqid();
-		const {power_status, temperature, setpoints,
-		       mode, description, manufacturerName,
+		const {description, manufacturerName,
 		       friendlyName} = req.body;
 
-		const deviceList = new Devices({tokenId: deviceToken, power_status, temperature, setpoints,
-		       mode, endpointId:uniq, description, manufacturerName,
+		const deviceList = new Devices({tokenId: infoToken,endpointId:uniq, description, manufacturerName,
 		       friendlyName});
 
 		const saveDeviceList = await deviceList.save();
@@ -250,62 +251,68 @@ app.post("/api/v1/device/addDevice/:token", async (req, res) => {
 
 
 //Get a Device List page
-app.get("/api/v1/device/getDevice/:token", async (req, res) => {
+app.get("/api/v1/device/getDevice", async (req, res) => {
 
 	try{
-		const getToken = req.params.token;
-		const endpoints = await Devices.find({tokenId: getToken}, {}).exec();
+
+		const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
+		const infoToken = "" + deviceToken.accessToken;
+		// const getToken = req.params.token;
+		const devices = await Devices.find({"tokenId": infoToken}, {"_id":0,"endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
 
 		res.json({
 			"success" : true,
 			"message" : "Found data.",
-			"data": {
-				endpoints,
-				"displayCategories": ["THERMOSTAT", "TEMPERATURE_SENSOR"],
-                "capabilities":
-                [
-                    {
-                        "type": "AlexaInterface",
-                        "interface": "Alexa.ThermostatController",
-                        "version": "3",
-                        "properties": {
-                        "supported": [
-                            {
-                                "name": "targetSetpoint"
-                            },
-                            {
-                                "name": "thermostatMode"
-                            }
-                        ],
-                        "proactivelyReported": true,
-                        "retrievable": true
-                      },
-                      "configuration": {
-                            "supportedModes": ["OFF", "COOL", "HEAT"],
-                            "supportsScheduling": false
-                      }
-                    },
-                    {
-                      "type": "AlexaInterface",
-                      "interface": "Alexa.PowerController",
-                      "version": "3",
-                      "properties": {
-                        "supported": [
-                          {
-                            "name": "powerState"
+			 "endpoints":
+            [
+                {
+                    devices,
+                    "displayCategories": ["THERMOSTAT", "TEMPERATURE_SENSOR"],
+                    "capabilities":
+                    [
+                        {
+                            "type": "AlexaInterface",
+                            "interface": "Alexa.ThermostatController",
+                            "version": "3",
+                            "properties": {
+                            "supported": [
+                                {
+                                    "name": "targetSetpoint"
+                                },
+                                {
+                                    "name": "thermostatMode"
+                                }
+                            ],
+                            "proactivelyReported": true,
+                            "retrievable": true
+                          },
+                          "configuration": {
+                                "supportedModes": ["OFF", "COOL", "HEAT"],
+                                "supportsScheduling": false
                           }
-                        ],
-                        "proactivelyReported": true,
-                        "retrievable": true
-                      }
-                    },
-                    {
-                      "type": "AlexaInterface",
-                      "interface": "Alexa",
-                      "version": "3"
-                    }
-                ]
-			}
+                        },
+                        {
+                          "type": "AlexaInterface",
+                          "interface": "Alexa.PowerController",
+                          "version": "3",
+                          "properties": {
+                            "supported": [
+                              {
+                                "name": "powerState"
+                              }
+                            ],
+                            "proactivelyReported": true,
+                            "retrievable": true
+                          }
+                        },
+                        {
+                          "type": "AlexaInterface",
+                          "interface": "Alexa",
+                          "version": "3"
+                        }
+                    ]
+                }
+            ]
 			
 		});
 

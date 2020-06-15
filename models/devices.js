@@ -3,9 +3,6 @@ var uniqid   = require("uniqid");
 
 var deviceSchema = new mongoose.Schema({
 	tokenId : {type: String, required: true},
-	power_status: {type: Number, required: true},
-	temperature: {type: Number, required: true},
-	setpoints: {type: Number, required: true},
 	endpointId: {type: String, required: true},
 	description: {type: String, required: true},
 	manufacturerName: {type: String, required: true},
