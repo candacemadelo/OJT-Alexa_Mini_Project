@@ -156,29 +156,33 @@ app.post("/api/v1/user/register", async (req, res) => {
 	    const {firstName, lastName, email, password } = req.body;
 
 	    const user = new User({firstName, lastName, email, password });
-	    const saveUser = await user.save();
-	    const userInfo = saveUser._id;
-	    //const session = await initializeSession(userInfo);
-	    const currentUser = await User.find({_id: userInfo}).exec();
+	    // const saveUser = await user.save();
+	    // const userInfo = saveUser._id;
+	    // //const session = await initializeSession(userInfo);
+	    // const currentUser = await User.find({_id: userInfo}).exec();
 
-	    // res.cookie('token', session.token, {
-	    // 	httpOnly: true,
-	    //     sameSite: true,
-	    //     maxAge:  2 * 60 * 60 * 1000, // 2 hours
-	    //     secure: process.env.NODE_ENV === 'production',
-	    // })
+	    // // res.cookie('token', session.token, {
+	    // // 	httpOnly: true,
+	    // //     sameSite: true,
+	    // //     maxAge:  2 * 60 * 60 * 1000, // 2 hours
+	    // //     secure: process.env.NODE_ENV === 'production',
+	    // // })
 
-	    res.status(201).json({
-	    	"success" : true,
-	    	"message": 'Successfully Registered!',
-	    	"details": 'User has been saved successfully.',
-	    	"data": {
-	    		"registerUser": currentUser
-	    	}
-	    });
-
-
-	    //res.render("login");
+	   const registerUser = new User(user);
+	    await registerUser.save((error) =>{
+			if(error){
+				console.log(error);
+			} else {
+				res.status(201).json({
+					"success" : true,
+					"message": 'Successfully Registered!',
+					"details": 'User has been saved successfully.',
+					"data": {
+						"registerUser": user
+					}
+				});
+			}
+		});
 
     } catch (err) {
     res.status(400).json({
