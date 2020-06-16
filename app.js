@@ -210,8 +210,9 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 //Add a Device List page
 app.post("/api/v1/device/addDevice", async (req, res) => {
-	const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
-	const infoToken = "" + deviceToken.accessToken;
+	const deviceToken = await AccessToken.findOne({}, {"user": 1, "_id":0}).sort({'_id':-1}).limit(1);
+	const infoToken = "" + deviceToken.user;
+
 	try{
 
 		const uniq = uniqid();
@@ -255,65 +256,78 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 
 	try{
 
-		const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
-		const infoToken = "" + deviceToken.accessToken;
-		// const getToken = req.params.token;
-		const devices = await Devices.find({"tokenId": infoToken}, {"_id":0,"endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+		const deviceToken = await AccessToken.findOne({}, {"user": 1, "_id":0}).sort({'_id':-1}).limit(1);
+		const infoToken = "" + deviceToken.user;
+		console.log(infoToken);
+		const data = await Devices.find({"tokenId": infoToken}, {"_id":0,"endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+		console.log(data);
+		
+	
+		var endpoints = [];
+		for(i = 0; i < data.length; i++) {
+			var endId = data[i].endpointId;
+			var mname = data[i].manufacturerName;
+			var fname = data[i].friendlyName;
+			var desc = data[i].description;
+
+			endpoints.push({
+                "endpointId": endId,
+                "manufacturerName": mname,
+                "friendlyName": fname,
+                "description": desc,
+                "displayCategories": ["THERMOSTAT", "TEMPERATURE_SENSOR"],
+                "capabilities":
+                [
+                    {
+                        "type": "AlexaInterface",
+                        "interface": "Alexa.ThermostatController",
+                        "version": "3",
+                        "properties": {
+                        "supported": [
+                            {
+                                "name": "targetSetpoint"
+                            },
+                            {
+                                "name": "thermostatMode"
+                            }
+                        ],
+                        "proactivelyReported": true,
+                        "retrievable": true
+                      },
+                      "configuration": {
+                            "supportedModes": ["OFF", "COOL", "HEAT"],
+                            "supportsScheduling": false
+                      }
+                    },
+                    {
+                      "type": "AlexaInterface",
+                      "interface": "Alexa.PowerController",
+                      "version": "3",
+                      "properties": {
+                        "supported": [
+                          {
+                            "name": "powerState"
+                          }
+                        ],
+                        "proactivelyReported": true,
+                        "retrievable": true
+                      }
+                    },
+                    {
+                      "type": "AlexaInterface",
+                      "interface": "Alexa",
+                      "version": "3"
+                    }
+                ]
+            
+				
+			});
+		}	
 
 		res.json({
-			"success" : true,
-			"message" : "Found data.",
-			 "endpoints":
-            [
-                {
-                    devices,
-                    "displayCategories": ["THERMOSTAT", "TEMPERATURE_SENSOR"],
-                    "capabilities":
-                    [
-                        {
-                            "type": "AlexaInterface",
-                            "interface": "Alexa.ThermostatController",
-                            "version": "3",
-                            "properties": {
-                            "supported": [
-                                {
-                                    "name": "targetSetpoint"
-                                },
-                                {
-                                    "name": "thermostatMode"
-                                }
-                            ],
-                            "proactivelyReported": true,
-                            "retrievable": true
-                          },
-                          "configuration": {
-                                "supportedModes": ["OFF", "COOL", "HEAT"],
-                                "supportsScheduling": false
-                          }
-                        },
-                        {
-                          "type": "AlexaInterface",
-                          "interface": "Alexa.PowerController",
-                          "version": "3",
-                          "properties": {
-                            "supported": [
-                              {
-                                "name": "powerState"
-                              }
-                            ],
-                            "proactivelyReported": true,
-                            "retrievable": true
-                          }
-                        },
-                        {
-                          "type": "AlexaInterface",
-                          "interface": "Alexa",
-                          "version": "3"
-                        }
-                    ]
-                }
-            ]
-			
+			"success": true,
+	     	"message": "Found data",
+			endpoints
 		});
 
 	} catch(err) {
