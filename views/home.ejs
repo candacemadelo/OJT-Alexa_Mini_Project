@@ -3,26 +3,24 @@
   <div class="row">
     <div class="col s12 m3 l3"></div>
     <div class="col s12 m3 l6">
-      <div class="card">
+      <div class="card z-depth-5">
         <div class="card-image grey darken-3">
-          <img style="height: 80px;" src="https://lh3.googleusercontent.com/proxy/Zo3YHFdl72HdClnleLT9smhPTZoaC-BKN28WuxFWYKmWD6JA-iGqHfb3i73-XyBU4KnJOR7dyRRAKirp6dYBDX0iJSEGxvh2qRwLCKZP46CyW_NQw_pJDMTH" alt="">
-          <span class="card-title white-text">
-            <div class="col s12">
-              <h4 class="center-align">THERMOSTATS</h4>
-            </div>    
-          </span>
-          <a class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
+          <img src="https://lh3.googleusercontent.com/proxy/Zo3YHFdl72HdClnleLT9smhPTZoaC-BKN28WuxFWYKmWD6JA-iGqHfb3i73-XyBU4KnJOR7dyRRAKirp6dYBDX0iJSEGxvh2qRwLCKZP46CyW_NQw_pJDMTH" alt="">
+          <h4 class="center white-text">THERMOSTATS</h4><br>
+          <a href="/api/v1/device/addDevice" class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
         </div>
-        <div class="card-action">
-          <ul class="collapsible" data-collapsible="accordion">
-            <li>
+        <div class="card-content">
+          <ul class="collapsible expandable" data-collapsible="accordion">
+            <li style="margin-bottom: 5px;">
               <div class="collapsible-header grey darken-4 white-text">
                 <div class="col s12">
                   <div class="left">
-                    <span>DEVICE 1</span>
-                    <span>44°</span>
+                    <h6>
+                      <span>DEVICE 1</span> | 
+                      <span>44°</span>
+                    </h6>
                   </div>
-                  <div class="switch right-align">
+                  <div class="switch right">
                     <label>
                       <input type="checkbox">
                       <span class="lever"></span>
@@ -31,15 +29,22 @@
                 </div>
               </div>
               <div class="collapsible-body grey darken-3">
-                <span></span>
+                  <div class="">
+                    <a class="waves-effect waves-light btn blue"><i class="material-icons left">ac_unit</i>COOL</a>
+                    <a class="waves-effect waves-light btn red"><i class="material-icons left">whatshot</i>HEAT</a>
+                    <a style="margin-left: 10px;" class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
+                    <a class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a>
+                  </div>
               </div>
             </li>
-            <li>
+            <li style="margin-bottom: 5px;">
               <div class="collapsible-header grey darken-4 white-text">
                 <div class="col s12">
                   <div class="left">
-                    <span>DEVICE 2</span>
-                    <span>35°</span>
+                    <h6>
+                      <span>DEVICE 2</span> |
+                      <span>35°</span>
+                    </h6>
                   </div>
                   <div class="switch right-align">
                     <label>
@@ -50,22 +55,22 @@
                 </div>
               </div>
               <div class="collapsible-body grey darken-3">
-                <div class="left-align">
-                  <a class="btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">add</i></a>
-                  <a class="btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">subtract</i></a>
-                </div>
-                <div class="right-align">
+                <div class="">
                   <a class="waves-effect waves-light btn blue"><i class="material-icons left">ac_unit</i>COOL</a>
                   <a class="waves-effect waves-light btn red"><i class="material-icons left">whatshot</i>HEAT</a>
+                  <a style="margin-left: 10px;" class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
+                  <a class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a>
                 </div>
               </div>
             </li>
-            <li>
+            <li style="margin-bottom: 5px;" >
               <div class="collapsible-header grey darken-4 white-text">
                 <div class="col s12">
                   <div class="left">
-                    <span>DEVICE 3</span>
-                    <span>33°</span>
+                    <h6>
+                      <span>DEVICE 3</span> |
+                      <span>33°</span>
+                    </h6>
                   </div>
                   <div class="switch right-align">
                     <label>
@@ -76,34 +81,22 @@
                 </div>
               </div>
               <div class="collapsible-body grey darken-3">
-                <span></span>
-              </div>
-            </li>
-            <li>
-              <div class="collapsible-header grey darken-4 white-text">
-                <div class="col s12">
-                  <div class="left">
-                    <span>DEVICE 4</span>
-                    <span>38°</span>
-                  </div>
-                  <div class="switch right">
-                    <label>
-                      <input type="checkbox">
-                      <span class="lever"></span>
-                    </label>
-                  </div>
+                <div class="">
+                  <a class="waves-effect waves-light btn blue"><i class="material-icons left">ac_unit</i>COOL</a>
+                  <a class="waves-effect waves-light btn red"><i class="material-icons left">whatshot</i>HEAT</a>
+                  <a style="margin-left: 10px;" class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
+                  <a class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a>
                 </div>
               </div>
-              <div class="collapsible-body">
-                <span></span>
-              </div>
             </li>
-            <li>
+            <li style="margin-bottom: 5px;">
               <div class="collapsible-header grey darken-4 white-text">
                 <div class="col s12">
                   <div class="left">
-                    <span>DEVICE 5</span>
-                    <span>40°</span>
+                    <h6>
+                      <span>DEVICE 4</span> |
+                      <span>38°</span>
+                    </h6>
                   </div>
                   <div class="switch right">
                     <label>
@@ -114,7 +107,38 @@
                 </div>
               </div>
               <div class="collapsible-body grey darken-3">
-                <span></span>
+                <div class="">
+                  <a class="waves-effect waves-light btn blue"><i class="material-icons left">ac_unit</i>COOL</a>
+                  <a class="waves-effect waves-light btn red"><i class="material-icons left">whatshot</i>HEAT</a>
+                  <a style="margin-left: 10px;" class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
+                  <a class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a>
+                </div>
+              </div>
+            </li>
+            <li style="margin-bottom: 5px;">
+              <div class="collapsible-header grey darken-4 white-text">
+                <div class="col s12">
+                  <div class="left">
+                    <h6>
+                      <span>DEVICE 5</span> |
+                      <span>40°</span>
+                    </h6>
+                  </div>
+                  <div class="switch right">
+                    <label>
+                      <input type="checkbox">
+                      <span class="lever"></span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="collapsible-body grey darken-3">
+                <div class="">
+                  <a class="waves-effect waves-light btn blue"><i class="material-icons left">ac_unit</i>COOL</a>
+                  <a class="waves-effect waves-light btn red"><i class="material-icons left">whatshot</i>HEAT</a>
+                  <a style="margin-left: 10px;" class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
+                  <a class="right btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a>
+                </div>
               </div>
             </li>
           </ul>
