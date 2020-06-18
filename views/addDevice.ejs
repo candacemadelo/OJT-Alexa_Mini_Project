@@ -1,45 +1,45 @@
 <%- include("partials/header") %>
-<div class="container" style="padding-top: 20px;">
+<div class="container"><br><br>
   <div class="row">
-    <div class="col s4"></div>
-    <div class="col s4 z-depth-5" style="background-size: cover; background-image: url('https://i.pinimg.com/originals/59/3f/a2/593fa20d2128f90ed60b29e268a4d082.jpg');">
-      <div class="card" >
-        <div class="card-image">
-          <div class="col s12" style="height: 225px;">
-            <center>
-              <img src="https://pngimage.net/wp-content/uploads/2018/06/simbolo-refrigera%C3%A7%C3%A3o-png-7.png" alt="" 
-            style="height: 250px; width: 250px;">
-            </center>
-          </div>
-          <form class="col s12" action="/api/v1/user/login" method="POST">
+    <div class="col s12 m3 l3"></div>
+    <div class="col s12 m3 l6">
+      <div class="card z-depth-5">
+        <div class="card-image grey darken-3">
+          <img src="https://lh3.googleusercontent.com/proxy/Zo3YHFdl72HdClnleLT9smhPTZoaC-BKN28WuxFWYKmWD6JA-iGqHfb3i73-XyBU4KnJOR7dyRRAKirp6dYBDX0iJSEGxvh2qRwLCKZP46CyW_NQw_pJDMTH" alt="">
+          <h4 class="center white-text">ADD NEW DEVICE</h4><br>
+        </div>
+        <div class="card-content">
+          <form action="/api/v1/device/addNewDevice" method="POST">
             <div class="row">
               <div class="input-field col s12">
-                <i class="material-icons prefix">email</i>
-                <input id="icon_prefix" type="text" class="validate white-text" name="email" required>
+                <i class="material-icons prefix">description</i>
+                <input id="icon_prefix" type="text" class="validate white-text" name="description" required>
                 <label for="icon_prefix">Description</label>
               </div>
               <div class="input-field col s12">
-                <i class="material-icons prefix">email</i>
-                <input id="icon_prefix" type="text" class="validate white-text" name="email" required>
+                <i class="material-icons prefix">build</i>
+                <input id="icon_prefix" type="text" class="validate white-text" name="manufacturer" required>
                 <label for="icon_prefix">Manufacturer Name</label>
               </div>
               <div class="input-field col s12">
-                <i class="material-icons prefix">email</i>
-                <input id="icon_prefix" type="text" class="validate white-text" name="email" required>
+                <i class="material-icons prefix">devices</i>
+                <input id="icon_prefix" type="text" class="validate white-text" name="name" required>
                 <label for="icon_prefix">Friendly Name</label>
               </div>
             </div>
             <div class="row">
-              <div class="col s2"></div>
-                <a class="btn waves-effect waves-light btn-large col s8" href="/registerpage">SAVE</a>
-              <div class="col s2"></div>
+              <div class="col s12 m12 l12">
+                <a href="/api/v1/user/home" class="left btn red waves-effect waves-light btn-large col s5">CANCEL<i class="material-icons right">cancel</i></a> 
+                <button class="right btn waves-effect waves-light btn-large col s5" type="submit" name="action">SAVE
+                  <i class="material-icons right">library_add</i>
+                </button>
+              </div>
             </div>
           </form>
-          <div class="col s12" style="height: 100px;"></div>
         </div>
       </div>
     </div>
-    <div class="col s4"></div>
+    <div class="col s12 m3 l3"></div>
   </div>
 </div>
 <%- include("partials/footer") %>
