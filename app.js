@@ -16,7 +16,7 @@ mongoose.connect("mongodb+srv://dre123:6TyT6wxrwqjMv3iP@cluster0-ztdrl.mongodb.n
 //Models Configuration
 var	User    = require("./models/registration"),
     Devices = require("./models/devices"),
-const { collection, count } = require("./models/registration"),
+// const { collection, count } = require("./models/registration"),
     Session = require("./models/sessionToken"),
     AccessToken = require("./models/oauth"),
     Commands = require("./models/commandDevices");
@@ -369,20 +369,63 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 		var deviceID = req.params.id;
 	try{
 		const deviceStatus = await Devices.findById(deviceID, {}).exec();
-		res.json({
-			message: 'Device found!',
-			detail: "You have Successfully added a new device",
-			deviceStatus
+		
+		res.status(201).json({
+			"success" : true,
+			"message" : "Data found",
+			 "context": 
+		      {
+				"properties": [
+		            {
+		                "namespace": "Alexa.ThermostatController",
+		                "name": "thermostatMode",
+		                "value": "COOL",
+		                "timeOfSample": "2017-02-03T16:20:50.52Z",
+		                "uncertaintyInMilliseconds": 500
+		            },
+		            {
+		                "namespace": "Alexa.ThermostatController",
+		                "name": "targetSetpoint",
+		                "value": {
+		                  "value": 20.0,
+		                  "scale": "CELSIUS"
+		                },
+		                "timeOfSample": "2017-02-03T16:20:50.52Z",
+		                "uncertaintyInMilliseconds": 500
+		            },
+		            {
+		                "namespace": "Alexa.TemperatureSensor",
+		                "name": "temperature",
+		                "value": {
+		                  "value": 19.9,
+		                  "scale": "CELSIUS"
+		                },
+		                "timeOfSample": "2017-02-03T16:20:50.52Z",
+		                "uncertaintyInMilliseconds": 1000
+		            },
+		            {
+		                "namespace": "Alexa.PowerController",
+		                "name": "powerState",
+		                "value": "ON",
+		                "timeOfSample": "2017-02-03T16:20:50.52Z",
+		                "uncertaintyInMilliseconds": 0
+		            }]
+		     }
+
 		});
+
+
 		console.log(deviceStatus);
 
 	} catch(err) {
 		res.status(400).json ({
 			errors: [
 				{
-					"success": true,
+					"success": false,
 					"message": "Failed retrieving data.",
-					errorMessage: err.message
+					"errorMessage": [
+						err.message
+					]
 				}
 			]
 		});
@@ -396,8 +439,10 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 app.post("/api/v1/device/commandControl/:token", async (req, res) => {
 	var devToken = req.params.token;
 
+	// to finalize pa ang logic
+
 	try {
-		const getEndpointId = await Devices.find({tokenId:devToken}, {"_id":0, "tokenId" : 0, "userId" : 0, 
+		const getEndpointId = await Devices.find({"tokenId":devToken}, {"tokenId" : 0, "userId" : 0, 
 			                                      "endpointId": 1, "manufacturerName" : 0, "description": 0, "friendlyName": 0}).exec();
 		console.log(getEndpointId);
 		const {power_status, temperature, mode} = req.body;
@@ -408,12 +453,13 @@ app.post("/api/v1/device/commandControl/:token", async (req, res) => {
 
 		res.status(201).json({
 			"success" : true,
-			"message" : "Success!";
+			"message" : "Success!",
 			device
 		});
 
 
 	} catch(err) {
+		console.log(err);
 		res.status(400).json ({
 			"success" : false,
 			"message" : "Command Failed."
