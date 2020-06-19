@@ -15,10 +15,11 @@ mongoose.connect("mongodb+srv://dre123:6TyT6wxrwqjMv3iP@cluster0-ztdrl.mongodb.n
 
 //Models Configuration
 var	User    = require("./models/registration"),
-    Devices = require("./models/devices");
-const { collection, count } = require("./models/registration");
-    Session = require("./models/sessionToken");
-    AccessToken = require("./models/oauth");
+    Devices = require("./models/devices"),
+const { collection, count } = require("./models/registration"),
+    Session = require("./models/sessionToken"),
+    AccessToken = require("./models/oauth"),
+    Commands = require("./models/commandDevices");
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -218,16 +219,19 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/api/v1/device/addDevice", async (req, res) => {
-	const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
-	const infoToken = "" + deviceToken.accessToken;
+app.post("/api/v1/device/addDevice/:token", async (req, res) => {
+	var getToken = req.params.token;
+
+	const deviceToken = await AccessToken.find({accessToken:getToken}, {"user": 1, "_id":0}).exec();
+	//const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
+	const infoUser = "" + deviceToken.user;
 	try{
 
 		const uniq = uniqid();
 		const {description, manufacturerName,
 		       friendlyName} = req.body;
 
-		const deviceList = new Devices({tokenId: infoToken,endpointId:uniq, description, manufacturerName,
+		const deviceList = new Devices({userId: infoUser, tokenId: getToken, endpointId:uniq, description, manufacturerName,
 		       friendlyName});
 
 		const saveDeviceList = await deviceList.save();
@@ -260,18 +264,85 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 
 
 //Get a Device List page
-app.get("/api/v1/device/getDevice", async (req, res) => {
+app.get("/api/v1/device/getDevice/:token", async (req, res) => {
 
 	try{
+		var getToken = req.params.token;
 
-		const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
-		const infoToken = "" + deviceToken.accessToken;
-		// const getToken = req.params.token;
-		const endpoints = await Devices.find({"tokenId": infoToken}, {"_id":0,"endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+		const deviceToken = await AccessToken.find({accessToken:getToken}, {"user": 1, "_id":0}).exec();
+		console.log(deviceToken);
+		//const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
+		//const deviceToken = await AccessToken.findOne({}, {"user": 1, "_id":0}).sort({'_id':-1}).limit(1);
+		const infoUser = "" + deviceToken.user;
+		console.log(infoToken);
+		const data = await Devices.find({"userId": infoUser}, {"_id":0, "tokenId": 0,"endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+		console.log(data);
+		
+	
+		var endpoints = [];
+		for(i = 0; i < data.length; i++) {
+			var endId = data[i].endpointId;
+			var mname = data[i].manufacturerName;
+			var fname = data[i].friendlyName;
+			var desc = data[i].description;
 
-		res.json({
-			"success" : true,
-			"message" : "Found data.",
+			endpoints.push({
+                "endpointId": endId,
+                "manufacturerName": mname,
+                "friendlyName": fname,
+                "description": desc,
+                "displayCategories": ["THERMOSTAT", "TEMPERATURE_SENSOR"],
+                "capabilities":
+                [
+                    {
+                        "type": "AlexaInterface",
+                        "interface": "Alexa.ThermostatController",
+                        "version": "3",
+                        "properties": {
+                        "supported": [
+                            {
+                                "name": "targetSetpoint"
+                            },
+                            {
+                                "name": "thermostatMode"
+                            }
+                        ],
+                        "proactivelyReported": true,
+                        "retrievable": true
+                      },
+                      "configuration": {
+                            "supportedModes": ["OFF", "COOL", "HEAT"],
+                            "supportsScheduling": false
+                      }
+                    },
+                    {
+                      "type": "AlexaInterface",
+                      "interface": "Alexa.PowerController",
+                      "version": "3",
+                      "properties": {
+                        "supported": [
+                          {
+                            "name": "powerState"
+                          }
+                        ],
+                        "proactivelyReported": true,
+                        "retrievable": true
+                      }
+                    },
+                    {
+                      "type": "AlexaInterface",
+                      "interface": "Alexa",
+                      "version": "3"
+                    }
+                ]
+            
+				
+			});
+		}	
+
+		res.status(201).json({
+			"success": true,
+	     	"message": "Found data",
 			endpoints
 		});
 
@@ -309,8 +380,8 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 		res.status(400).json ({
 			errors: [
 				{
-					success: true,
-					message: "Failed retrieving data.",
+					"success": true,
+					"message": "Failed retrieving data.",
 					errorMessage: err.message
 				}
 			]
@@ -319,7 +390,37 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 		console.log(err);
 	}
 });
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+//Command Control API
+app.post("/api/v1/device/commandControl/:token", async (req, res) => {
+	var devToken = req.params.token;
+
+	try {
+		const getEndpointId = await Devices.find({tokenId:devToken}, {"_id":0, "tokenId" : 0, "userId" : 0, 
+			                                      "endpointId": 1, "manufacturerName" : 0, "description": 0, "friendlyName": 0}).exec();
+		console.log(getEndpointId);
+		const {power_status, temperature, mode} = req.body;
+		const newCommand = new Commands({token: deviceToken, power_status, temperature, mode, endpointId:getEndpointId});
+		const saveCommands = await newCommand.save();
+		const commandId = saveCommands._id;
+		const device = await Commands.find({_id: commandId}).exec();
+
+		res.status(201).json({
+			"success" : true,
+			"message" : "Success!";
+			device
+		});
+
+
+	} catch(err) {
+		res.status(400).json ({
+			"success" : false,
+			"message" : "Command Failed."
+		});
+	}
+});
+
 
 
 //localhost
