@@ -193,14 +193,7 @@ app.post("/api/v1/user/register", async (req, res) => {
 			}
 		});
 
-<<<<<<< HEAD
-    } catch (err) {
-
-    console.log(err);
-
-=======
     } catch (err) {	
->>>>>>> 25ed8eb424d28a7db09b936cb12f2d2dfdeb200c
     res.status(400).json({
       errors: [
         {
@@ -390,7 +383,7 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 });
 
 //Get device status
-app.get("/api/v1/device/deviceState/:id", async (req, res) => {
+app.get("/api/v1/device/getStates", async (req, res) => {
 	
 	console.log(req);
 
@@ -399,44 +392,32 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 		const deviceStatus = await Devices.findById(deviceID, {}).exec();
 		
 		res.status(201).json({
-			"success" : true,
-			"message" : "Data found",
-			 "context": 
+			"context": 
 		      {
 				"properties": [
 		            {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
-		                "value": "COOL",
-		                "timeOfSample": "2017-02-03T16:20:50.52Z",
+		                "value": //getMode,
+		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            },
 		            {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "targetSetpoint",
 		                "value": {
-		                  "value": 20.0,
+		                  "value": //getTemp,
 		                  "scale": "CELSIUS"
 		                },
-		                "timeOfSample": "2017-02-03T16:20:50.52Z",
+		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.TemperatureSensor",
-		                "name": "temperature",
-		                "value": {
-		                  "value": 19.9,
-		                  "scale": "CELSIUS"
-		                },
-		                "timeOfSample": "2017-02-03T16:20:50.52Z",
-		                "uncertaintyInMilliseconds": 1000
 		            },
 		            {
 		                "namespace": "Alexa.PowerController",
 		                "name": "powerState",
-		                "value": "ON",
-		                "timeOfSample": "2017-02-03T16:20:50.52Z",
-		                "uncertaintyInMilliseconds": 0
+		                "value": //getPowStat,
+		                "timeOfSample": new Date.getTime(),
+		                "uncertaintyInMilliseconds": 500
 		            }]
 		     }
 
