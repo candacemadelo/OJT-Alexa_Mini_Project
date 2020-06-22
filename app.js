@@ -189,27 +189,24 @@ app.post("/api/v1/user/register", async (req, res) => {
 			if(error){
 				console.log(error);
 			} else {
-				res.status(201).json({
-					"success" : true,
-					"message": 'Successfully Registered!',
-					"details": 'User has been saved successfully.',
-					"data": {
-						"registerUser": user
-					}
-				});
+				res.render("login");
 			}
 		});
 
+<<<<<<< HEAD
     } catch (err) {
 
     console.log(err);
 
+=======
+    } catch (err) {	
+>>>>>>> 25ed8eb424d28a7db09b936cb12f2d2dfdeb200c
     res.status(400).json({
       errors: [
         {
           "success": false,
           "message": 'Registration Failed',
-          "Error_code": 1308,
+          "Error_code"	: 1308,
           "data": {
           	"registerUser": [
           		req.body
@@ -486,7 +483,7 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 
 		res.status(201).json({
 			"success" : true,
-			"message" : "Success!",
+			"message" : "Command Success!",
 			device
 		});
 
