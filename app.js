@@ -14,12 +14,11 @@ mongoose.connect("mongodb+srv://dre123:6TyT6wxrwqjMv3iP@cluster0-ztdrl.mongodb.n
 	             { useNewUrlParser: true, useUnifiedTopology:true, useFindAndModify: false, useCreateIndex :true });
 
 //Models Configuration
-var	User    = require("./models/registration"),
-    Devices = require("./models/devices"),
-// const { collection, count } = require("./models/registration"),
-    Session = require("./models/sessionToken"),
+var	User    	= require("./models/registration"),
+    Devices 	= require("./models/devices"),
+    Session 	= require("./models/sessionToken"),
     AccessToken = require("./models/oauth"),
-    Commands = require("./models/commandDevices");
+    Commands 	= require("./models/commandDevices");
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -45,9 +44,9 @@ const isEmail = (email) => {
 
 
 //initializing a new session and save data to db
-const initializeSession = async (userInfo) => {
-	const token = await Session.generateToken();
-	const session = new Session({token, userInfo});
+const initializeToken = async (user) => {
+	const token = await AccessToken.generateToken();
+	const session = new AccessToken({user, client: "5ee1d521971c658529d2514a", accessToken:token, scope: "read"});
 	await session.save();
 	return session;
 };
@@ -111,20 +110,19 @@ app.post('/api/v1/user/login', async (req, res) => {
     }
 
     //queries database to find a user with the received email
-    const user = await User.findOne({ email });
-    if (!user) {
+    const findUser = await User.findOne({ email });
+    if (!findUser) {
       throw new Error("User does not exist.");
       // res.render("home");
     }
     //using bcrypt to compare passwords
-    const passwordValidated = await bcrypt.compare(password, user.password);
+    const passwordValidated = await bcrypt.compare(password, findUser.password);
     if (!passwordValidated) {
       throw new Error("Password does not match.");
     }
 
-    const userInfo = user._id;
-    const session = await initializeSession(userInfo);
-    //const session = new Session({status, token, userInfo});
+    const user = findUser._id;
+    const session = await initializeToken(user);
     const saveSession = await session.save();
     const sessionId = saveSession._id;
 
@@ -136,7 +134,7 @@ app.post('/api/v1/user/login', async (req, res) => {
 
     }).status(201);
 
-	const data = await Session.find({_id:sessionId}).populate("userInfo").exec();
+	const data = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
 	
 	res.json({
 	 	"success": true,
@@ -219,12 +217,19 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 
 //Add a Device List page
-app.post("/api/v1/device/addDevice/:token", async (req, res) => {
-	var getToken = req.params.token;
+app.post("/api/v1/device/addDevice", async (req, res) => {
+	var getToken = req.query.token;
 
 	const deviceToken = await AccessToken.find({accessToken:getToken}, {"user": 1, "_id":0}).exec();
-	//const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
-	const infoUser = "" + deviceToken.user;
+	console.log(deviceToken);
+
+	for(var i = 0; i < deviceToken.length; i++) {
+		var devUser = deviceToken[i].user;
+	}
+
+	var infoUser = "" + devUser;
+	console.log(infoUser);
+
 	try{
 
 		const uniq = uniqid();
@@ -236,7 +241,7 @@ app.post("/api/v1/device/addDevice/:token", async (req, res) => {
 
 		const saveDeviceList = await deviceList.save();
 		const deviceId = saveDeviceList._id;
-		const data = await Devices.find({_id: deviceId}).exec();
+		const data = await Devices.find({"_id": deviceId}).exec();
 
 		 res.json({
 		 	"success": true,
@@ -264,18 +269,24 @@ app.post("/api/v1/device/addDevice/:token", async (req, res) => {
 
 
 //Get a Device List page
-app.get("/api/v1/device/getDevice/:token", async (req, res) => {
+app.get("/api/v1/device/getDevice", async (req, res) => {
 
 	try{
-		var getToken = req.params.token;
+		var getToken = req.query.token;
+		console.log(getToken);
 
 		const deviceToken = await AccessToken.find({accessToken:getToken}, {"user": 1, "_id":0}).exec();
 		console.log(deviceToken);
-		//const deviceToken = await AccessToken.findOne({}, {"accessToken": 1, "_id":0}).sort({'_id':-1}).limit(1);
-		//const deviceToken = await AccessToken.findOne({}, {"user": 1, "_id":0}).sort({'_id':-1}).limit(1);
-		const infoUser = "" + deviceToken.user;
-		console.log(infoToken);
-		const data = await Devices.find({"userId": infoUser}, {"_id":0, "tokenId": 0,"endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+
+		for(var i = 0; i < deviceToken.length; i++) {
+			var devUser = deviceToken[i].user;
+		}
+
+
+		const infoUser = "" + devUser;
+		console.log(infoUser);
+
+		const data = await Devices.find({"userId": infoUser}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
 		console.log(data);
 		
 	
@@ -436,15 +447,15 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 
 
 //Command Control API
-app.post("/api/v1/device/commandControl/:token", async (req, res) => {
-	var devToken = req.params.token;
+app.post("/api/v1/device/commandControl", async (req, res) => {
+	var devToken = req.query.token;
 
 	// to finalize pa ang logic
 
 	try {
-		const getEndpointId = await Devices.find({"tokenId":devToken}, {"tokenId" : 0, "userId" : 0, 
-			                                      "endpointId": 1, "manufacturerName" : 0, "description": 0, "friendlyName": 0}).exec();
+		const getEndpointId = await Devices.find({"token":devToken}, {"_id":0, "endpointId": 1}).exec();
 		console.log(getEndpointId);
+		
 		const {power_status, temperature, mode} = req.body;
 		const newCommand = new Commands({token: deviceToken, power_status, temperature, mode, endpointId:getEndpointId});
 		const saveCommands = await newCommand.save();
@@ -467,6 +478,29 @@ app.post("/api/v1/device/commandControl/:token", async (req, res) => {
 	}
 });
 
+
+//Delete Device API
+app.post("/api/v1/device/deleteDevice/:id", async(req, res) => {
+	var selectedDevice = req.params.id;
+
+	try {
+		const delDevice = await Devices.findByIdAndRemove({"_id": selectedDevice}).exec();
+
+		res.status(201).json({
+			"success" : true,
+			"message": "You have successfully deleted a device.",
+			delDevice
+		});
+
+	} catch (err) {
+		console.log(err);
+		res.status(400).json({
+			"success" : "false",
+			"messaage": "Device was not successfully deleted."
+		});
+	}
+
+});
 
 
 //localhost
