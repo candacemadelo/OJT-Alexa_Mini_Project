@@ -189,18 +189,10 @@ app.post("/api/v1/user/register", async (req, res) => {
 				console.log(error);
 			} else {
 				res.render("login");
-				// res.status(201).json({
-				// 	"success" : true,
-				// 	"message": 'Successfully Registered!',
-				// 	"details": 'User has been saved successfully.',
-				// 	"data": {
-				// 		"registerUser": user
-				// 	}
-				// });
 			}
 		});
 
-    } catch (err) {
+    } catch (err) {	
     res.status(400).json({
       errors: [
         {
