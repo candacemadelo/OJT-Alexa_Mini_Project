@@ -5,7 +5,6 @@ var methodOverride  = require("method-override"),
     bcrypt          = require("bcryptjs");
     cookieParser    = require('cookie-parser'),
     uniqid			= require('uniqid'),
-    jwt				= require('jsonwebtoken'),
     app				= express();
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -136,13 +135,11 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	const data = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
 	
-	// res.json({
-	//  	"success": true,
-	//  	"message": 'User logged in successfully.',
-	//  	data
-	//  });
-
-	res.render("home");
+	res.json({
+	 	"success": true,
+	 	"message": 'User logged in successfully.',
+	 	data
+	 });
 
     } catch (err) {
     res.status(400).json({
@@ -186,15 +183,14 @@ app.post("/api/v1/user/register", async (req, res) => {
 			if(error){
 				console.log(error);
 			} else {
-				res.render("login");
-				// res.status(201).json({
-				// 	"success" : true,
-				// 	"message": 'Successfully Registered!',
-				// 	"details": 'User has been saved successfully.',
-				// 	"data": {
-				// 		"registerUser": user
-				// 	}
-				// });
+				res.status(201).json({
+					"success" : true,
+					"message": 'Successfully Registered!',
+					"details": 'User has been saved successfully.',
+					"data": {
+						"registerUser": user
+					}
+				});
 			}
 		});
 
@@ -223,7 +219,7 @@ app.post("/api/v1/user/register", async (req, res) => {
 app.post("/api/v1/device/addDevice", async (req, res) => {
 	var getToken = req.query.token;
 
-	const deviceToken = await AccessToken.find({accessToken:getToken}, {"user": 1, "_id":0}).exec();
+	const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
 	console.log(deviceToken);
 
 	for(var i = 0; i < deviceToken.length; i++) {
@@ -278,7 +274,7 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		var getToken = req.query.token;
 		console.log(getToken);
 
-		const deviceToken = await AccessToken.find({accessToken:getToken}, {"user": 1, "_id":0}).exec();
+		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
 		console.log(deviceToken);
 
 		for(var i = 0; i < deviceToken.length; i++) {
@@ -475,7 +471,7 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 	} catch(err) {
 		console.log(err);
 		res.status(400).json ({
-			"success" : false,
+	 		"success" : false,
 			"message" : "Command Failed."
 		});
 	}
