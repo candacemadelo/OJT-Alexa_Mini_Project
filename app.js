@@ -138,11 +138,11 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	const data = await Session.find({_id:sessionId}).populate("userInfo").exec();
 	
-	// res.json({
-	//  	"success": true,
-	//  	"message": 'User logged in successfully.',
-	//  	data
-	//  });
+	res.json({
+	 	"success": true,
+	 	"message": 'User logged in successfully.',
+	 	data
+	 });
 
 	res.render("home");
 
@@ -198,7 +198,7 @@ app.post("/api/v1/user/register", async (req, res) => {
         {
           "success": false,
           "message": 'Registration Failed',
-          "Error_code": 1308,
+          "Error_code"	: 1308,
           "data": {
           	"registerUser": [
           		req.body
