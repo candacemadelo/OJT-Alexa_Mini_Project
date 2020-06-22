@@ -16,8 +16,7 @@ mongoose.connect("mongodb+srv://dre123:6TyT6wxrwqjMv3iP@cluster0-ztdrl.mongodb.n
 var	User    	= require("./models/registration"),
     Devices 	= require("./models/devices"),
     Session 	= require("./models/sessionToken"),
-    AccessToken = require("./models/oauth"),
-    Commands 	= require("./models/commandDevices");
+    AccessToken = require("./models/oauth");
 
 // App Configuration
 app.set("view engine", "ejs");
@@ -74,6 +73,8 @@ app.get('/registerpage', function(req, res) {
 
 //Login Page
 app.post('/api/v1/user/login', async (req, res) => {
+
+  console.log(req);
   try {
     const {email, password } = req.body;
 
@@ -142,6 +143,8 @@ app.post('/api/v1/user/login', async (req, res) => {
 	 });
 
     } catch (err) {
+
+    console.log(err);
     res.status(400).json({
 	      errors: [
 	        {
@@ -152,7 +155,7 @@ app.post('/api/v1/user/login', async (req, res) => {
 	          			req.body
 	          		]
 	          	},
-	          errorMessage: err.message,
+	          "errorMessage": err.message,
 	        },
 	      ],
 	    });
@@ -162,6 +165,9 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 // Registration page
 app.post("/api/v1/user/register", async (req, res) => {
+
+	console.log(req);
+
 	try {
 	    const {firstName, lastName, email, password } = req.body;
 
@@ -195,6 +201,9 @@ app.post("/api/v1/user/register", async (req, res) => {
 		});
 
     } catch (err) {
+
+    console.log(err);
+
     res.status(400).json({
       errors: [
         {
@@ -206,7 +215,7 @@ app.post("/api/v1/user/register", async (req, res) => {
           		req.body
           	]
           },
-          errorMessage: err.message,
+          "errorMessage": err.message,
         },
       ],
     });
@@ -217,6 +226,8 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 //Add a Device List page
 app.post("/api/v1/device/addDevice", async (req, res) => {
+	console.log(req);
+
 	var getToken = req.query.token;
 
 	const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
@@ -235,8 +246,9 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 		const {description, manufacturerName,
 		       friendlyName} = req.body;
 
-		const deviceList = new Devices({userId: infoUser, tokenId: getToken, endpointId:uniq, description, manufacturerName,
-		       friendlyName});
+		const deviceList = new Devices({userId: infoUser, tokenId: getToken, power_status: 0 , temperature : 0, 
+										mode: "undefined", endpointId:uniq, description, manufacturerName,
+		       							friendlyName});
 
 		const saveDeviceList = await deviceList.save();
 		const deviceId = saveDeviceList._id;
@@ -249,6 +261,9 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 		 })
 
 	} catch(err) {
+
+		console.log(err);
+
 		res.status(400).json ({
 			errors: [
 				{
@@ -270,6 +285,8 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 //Get a Device List page
 app.get("/api/v1/device/getDevice", async (req, res) => {
 
+	console.log(req);
+
 	try{
 		var getToken = req.query.token;
 		console.log(getToken);
@@ -280,7 +297,6 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		for(var i = 0; i < deviceToken.length; i++) {
 			var devUser = deviceToken[i].user;
 		}
-
 
 		const infoUser = "" + devUser;
 		console.log(infoUser);
@@ -357,6 +373,8 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		});
 
 	} catch(err) {
+		console.log(err);
+
 		res.status(400).json ({
 			errors: [
 				{
@@ -376,7 +394,10 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 
 //Get device status
 app.get("/api/v1/device/deviceState/:id", async (req, res) => {
-		var deviceID = req.params.id;
+	
+	console.log(req);
+
+	var deviceID = req.params.id;
 	try{
 		const deviceStatus = await Devices.findById(deviceID, {}).exec();
 		
@@ -424,10 +445,10 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 
 		});
 
-
-		console.log(deviceStatus);
-
 	} catch(err) {
+
+		console.log(err);
+
 		res.status(400).json ({
 			errors: [
 				{
@@ -447,19 +468,21 @@ app.get("/api/v1/device/deviceState/:id", async (req, res) => {
 
 //Command Control API
 app.post("/api/v1/device/commandControl", async (req, res) => {
+
+	console.log(req);
+
 	var devToken = req.query.token;
 
-	// to finalize pa ang logic
-
 	try {
-		const getEndpointId = await Devices.find({"token":devToken}, {"_id":0, "endpointId": 1}).exec();
-		console.log(getEndpointId);
-		
-		const {power_status, temperature, mode} = req.body;
-		const newCommand = new Commands({token: deviceToken, power_status, temperature, mode, endpointId:getEndpointId});
-		const saveCommands = await newCommand.save();
-		const commandId = saveCommands._id;
-		const device = await Commands.find({_id: commandId}).exec();
+		const getDevToken = req.body.tokenId;
+		const devPowStat  = req.body.power_status;
+		const getTemp 	  = req.body.temperature;
+		const getMode     = req.body.mode;
+		const getEndpoint = req.body.endpointId;
+
+		const device = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
+			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
+		console.log(device);
 
 		res.status(201).json({
 			"success" : true,
@@ -479,8 +502,9 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 
 
 //Delete Device API
-app.post("/api/v1/device/deleteDevice/:id", async(req, res) => {
-	var selectedDevice = req.params.id;
+app.post("/api/v1/device/deleteDevice", async(req, res) => {
+	var deleteDevTok    = req.query.token,
+	    deleteEndpoint  = req.query.endpoint;
 
 	try {
 		const delDevice = await Devices.findByIdAndRemove({"_id": selectedDevice}).exec();
