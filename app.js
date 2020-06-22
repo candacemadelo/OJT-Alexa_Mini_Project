@@ -138,11 +138,13 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	const data = await Session.find({_id:sessionId}).populate("userInfo").exec();
 	
-	res.json({
-	 	"success": true,
-	 	"message": 'User logged in successfully.',
-	 	data
-	 });
+	// res.json({
+	//  	"success": true,
+	//  	"message": 'User logged in successfully.',
+	//  	data
+	//  });
+
+	res.render("home");
 
     } catch (err) {
     res.status(400).json({
@@ -186,14 +188,15 @@ app.post("/api/v1/user/register", async (req, res) => {
 			if(error){
 				console.log(error);
 			} else {
-				res.status(201).json({
-					"success" : true,
-					"message": 'Successfully Registered!',
-					"details": 'User has been saved successfully.',
-					"data": {
-						"registerUser": user
-					}
-				});
+				res.render("login");
+				// res.status(201).json({
+				// 	"success" : true,
+				// 	"message": 'Successfully Registered!',
+				// 	"details": 'User has been saved successfully.',
+				// 	"data": {
+				// 		"registerUser": user
+				// 	}
+				// });
 			}
 		});
 
