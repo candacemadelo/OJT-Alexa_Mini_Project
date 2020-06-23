@@ -134,23 +134,17 @@ app.post('/api/v1/user/login', async (req, res) => {
 
     }).status(201);
 
-		const accessToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
-		console.log(accessToken);
-		// const deviceToken = await AccessToken.find({"accessToken":accessToken}, {"user": 1, "_id":0}).exec();
-		// console.log(deviceToken);
+	const data = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
+	
+	res.json({
+	 	"success": true,
+	 	"message": 'User logged in successfully.',
+	 	data
+	 });
 
-		// for(var i = 0; i < deviceToken.length; i++) {
-		// 	var devUser = deviceToken[i].user;
-		// }
-
-		// const infoUser = devUser;
-		// console.log(infoUser);
-
-		// const devices = await Devices.find({"userId": infoUser}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
-		// console.log(devices);
-		
-	res.render("home", {accessToken: accessToken});
     } catch (err) {
+
+    console.log(err);
     res.status(400).json({
 	      errors: [
 	        {
@@ -402,9 +396,10 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 		const getMode     = req.body.mode;
 		const getEndpoint = req.body.endpointId;
 
-		const device = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
+		const commandDevice = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
 			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
-		console.log(device);
+		const getdevice = "" + commandDevice._id;
+		const device = await Devices.find({"_id": getdevice}).exec();
 
 		res.status(201).json({
 			"success" : true,
@@ -439,7 +434,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		            {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
-		                "value": "getMode",
+		                "value": //getMode,
 		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            },
@@ -447,7 +442,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "targetSetpoint",
 		                "value": {
-		                  "value": "getTemp",
+		                  "value": //getTemp,
 		                  "scale": "CELSIUS"
 		                },
 		                "timeOfSample": new Date.getTime(),
@@ -456,7 +451,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		            {
 		                "namespace": "Alexa.PowerController",
 		                "name": "powerState",
-		                "value": "getPowStat",
+		                "value": //getPowStat,
 		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            }]
@@ -487,16 +482,27 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 
 //Delete Device API
 app.post("/api/v1/device/deleteDevice", async(req, res) => {
+	console.log(req);
+
 	var deleteDevTok    = req.query.token,
 	    deleteEndpoint  = req.query.endpoint;
 
 	try {
-		const delDevice = await Devices.findByIdAndRemove({"tokenId": deleteDevTok, "endpointId": deleteEndpoint}).exec();
+		const delDevice = await Devices.find({"tokenId": deleteDevTok, "endpointId": deleteEndpoint}, {"_id":1}).exec();
+		console.log(delDevice);
+
+		for(var i = 0; i < delDevice.length; i++) {
+			var device =  delDevice[i]._id;
+		}
+
+		const getdevice = "" + device;
+		console.log(device);
+		const deleteDevice = await Devices.findByIdAndRemove({"_id": device}).exec();
 
 		res.status(201).json({
 			"success" : true,
 			"message": "You have successfully deleted a device.",
-			delDevice
+			deleteDevice
 		});
 
 	} catch (err) {
