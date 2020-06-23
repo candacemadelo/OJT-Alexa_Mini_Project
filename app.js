@@ -438,7 +438,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const data = await Devices.find({"tokenID": token}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
-	
+		var timeNow = new Date().toISOString();
 		var context = [];
 		for(i = 0; i < data.length; i++) {
 			var thermostatMode = data[i].mode;
@@ -451,7 +451,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
 		                "value": thermostatMode,
-		                "timeOfSample": new Date.getTime(),
+		                "timeOfSample": timeNow,
 		                "uncertaintyInMilliseconds": 500
 		            },
 		            {
@@ -461,14 +461,14 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                  "value": temperature,
 		                  "scale": "CELSIUS"
 		                },
-		                "timeOfSample": new Date.getTime(),
+		                "timeOfSample": timeNow,
 		                "uncertaintyInMilliseconds": 500
 		            },
 		            {
 		                "namespace": "Alexa.PowerController",
 		                "name": "powerState",
 		                "value": powerState,
-		                "timeOfSample": new Date.getTime(),
+		                "timeOfSample": timeNow,
 		                "uncertaintyInMilliseconds": 500
 		            }]
 			});
@@ -540,5 +540,5 @@ app.post("/api/v1/device/deleteDevice", async(req, res) => {
 //localhost
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 app.listen(3000, process.env.IP, function() {
-   console.log("***** Server has started on port 3000. *****");
+	console.log("***** Server has started on port 3000. *****");
 });
