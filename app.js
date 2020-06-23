@@ -134,17 +134,23 @@ app.post('/api/v1/user/login', async (req, res) => {
 
     }).status(201);
 
-	const data = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
-	
-	res.json({
-	 	"success": true,
-	 	"message": 'User logged in successfully.',
-	 	data
-	 });
+		const accessToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
+		console.log(accessToken);
+		// const deviceToken = await AccessToken.find({"accessToken":accessToken}, {"user": 1, "_id":0}).exec();
+		// console.log(deviceToken);
 
+		// for(var i = 0; i < deviceToken.length; i++) {
+		// 	var devUser = deviceToken[i].user;
+		// }
+
+		// const infoUser = devUser;
+		// console.log(infoUser);
+
+		// const devices = await Devices.find({"userId": infoUser}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+		// console.log(devices);
+		
+	res.render("home", {accessToken: accessToken});
     } catch (err) {
-
-    console.log(err);
     res.status(400).json({
 	      errors: [
 	        {
@@ -398,7 +404,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		            {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
-		                "value": //getMode,
+		                "value": "getMode",
 		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            },
@@ -406,7 +412,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "targetSetpoint",
 		                "value": {
-		                  "value": //getTemp,
+		                  "value": "getTemp",
 		                  "scale": "CELSIUS"
 		                },
 		                "timeOfSample": new Date.getTime(),
@@ -415,7 +421,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		            {
 		                "namespace": "Alexa.PowerController",
 		                "name": "powerState",
-		                "value": //getPowStat,
+		                "value": "getPowStat",
 		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            }]
