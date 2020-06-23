@@ -372,8 +372,6 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		}	
 
 		res.status(201).json({
-			"success": true,
-	     	"message": "Found data",
 			endpoints
 		});
 
@@ -400,7 +398,7 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 //Command Control API
 app.post("/api/v1/device/commandControl", async (req, res) => {
 
-	console.log(req);
+	// console.log(req);
 
 	var devToken = req.query.token;
 
@@ -411,9 +409,20 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 		const getMode     = req.body.mode;
 		const getEndpoint = req.body.endpointId;
 
-		const commandDevice = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
+		const commandDevice = await AccessToken.find({"accessToken": getDevToken}, {"_id": 0, "user": 1}).exec();
+		console.log(commandDevice);
+
+		for(var i = 0; i < commandDevice.length; i++) {
+			var userDev = commandDevice[i].user;
+		}
+
+		const getUser = "" + userDev;
+		console.log(getUser);
+
+		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUser, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
 			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
-		const getdevice = "" + commandDevice._id;
+		console.log(getUserDevice);
+		const getdevice = "" + getUserDevice._id;
 		const device = await Devices.find({"_id": getdevice}).exec();
 
 		res.status(201).json({
@@ -489,8 +498,6 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			});
 		}
 		res.status(201).json({
-			"success": true,
-	     	"message": "Found data",
 			endpoints
 		});
 
