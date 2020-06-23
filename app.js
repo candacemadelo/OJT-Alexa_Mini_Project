@@ -134,11 +134,9 @@ app.post('/api/v1/user/login', async (req, res) => {
 
     }).status(201);
 
-    res.status(201).json({
-	 	"success": true,
-	 	"message": 'User logged in successfully.',
-	 	data
-	 });
+		const token = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
+
+		res.render('home', {tokenID: token});
 
     } catch (err) {
 
@@ -168,9 +166,21 @@ app.post("/api/v1/user/register", async (req, res) => {
 
 	try {
 	    const {firstName, lastName, email, password } = req.body;
-	    const user = new User({firstName, lastName, email, password });
 
-	    const registerUser = new User(user);
+	    const user = new User({firstName, lastName, email, password });
+	    // const saveUser = await user.save();
+	    // const userInfo = saveUser._id;
+	    // //const session = await initializeSession(userInfo);
+	    // const currentUser = await User.find({_id: userInfo}).exec();
+
+	    // // res.cookie('token', session.token, {
+	    // // 	httpOnly: true,
+	    // //     sameSite: true,
+	    // //     maxAge:  2 * 60 * 60 * 1000, // 2 hours
+	    // //     secure: process.env.NODE_ENV === 'production',
+	    // // })
+
+	   const registerUser = new User(user);
 	    await registerUser.save((error) =>{
 			if(error){
 				console.log(error);
