@@ -353,8 +353,6 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		}	
 
 		res.status(201).json({
-			"success": true,
-	     	"message": "Found data",
 			endpoints
 		});
 
@@ -470,8 +468,6 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			});
 		}
 		res.status(201).json({
-			"success": true,
-	     	"message": "Found data",
 			endpoints
 		});
 
