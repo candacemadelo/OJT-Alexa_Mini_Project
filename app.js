@@ -420,21 +420,37 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 
 //Get device status
 app.get("/api/v1/device/getStates", async (req, res) => {
-	
 	console.log(req);
-
-	var deviceID = req.params.id;
 	try{
-		const deviceStatus = await Devices.findById(deviceID, {}).exec();
+		var getToken = req.query.token;
+		console.log(getToken);
+
+		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
+		console.log(deviceToken);
+
+		for(var i = 0; i < deviceToken.length; i++) {
+			var devUser = deviceToken[i].user;
+		}
+
+		const infoUser = "" + devUser;
+		console.log(infoUser);
+
+		const data = await Devices.find({"tokenID": token}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		console.log(data);
 		
-		res.status(201).json({
-			"context": 
-		      {
+	
+		var context = [];
+		for(i = 0; i < data.length; i++) {
+			var thermostatMode = data[i].mode;
+			var temperature = data[i].temperature;
+			var powerState = data[i].power_status;
+
+			context.push({	
 				"properties": [
 		            {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
-		                "value": //getMode,
+		                "value": thermostatMode,
 		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            },
@@ -442,7 +458,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "targetSetpoint",
 		                "value": {
-		                  "value": //getTemp,
+		                  "value": temperature,
 		                  "scale": "CELSIUS"
 		                },
 		                "timeOfSample": new Date.getTime(),
@@ -451,12 +467,16 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		            {
 		                "namespace": "Alexa.PowerController",
 		                "name": "powerState",
-		                "value": //getPowStat,
+		                "value": powerState,
 		                "timeOfSample": new Date.getTime(),
 		                "uncertaintyInMilliseconds": 500
 		            }]
-		     }
-
+			});
+		}
+		res.status(201).json({
+			"success": true,
+	     	"message": "Found data",
+			endpoints
 		});
 
 	} catch(err) {
@@ -468,9 +488,10 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 				{
 					"success": false,
 					"message": "Failed retrieving data.",
-					"errorMessage": [
-						err.message
-					]
+					"data" : {
+						"token": [req.body]
+					},
+					"errorMessage": err.message
 				}
 			]
 		});
