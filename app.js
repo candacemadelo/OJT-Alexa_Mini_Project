@@ -390,10 +390,20 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 		const getMode     = req.body.mode;
 		const getEndpoint = req.body.endpointId;
 
-		const commandDevice = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
-			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
+		const commandDevice = await AccessToken.find({"accessToken": getDevToken}, {"_id": 0, "user": 1}).exec();
 		console.log(commandDevice);
-		const getdevice = "" + commandDevice._id;
+
+		for(var i = 0; i < commandDevice.length; i++) {
+			var userDev = commandDevice[i].user;
+		}
+
+		const getUser = "" + userDev;
+		console.log(getUser);
+
+		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUser, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
+			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
+		console.log(getUserDevice);
+		const getdevice = "" + getUserDevice._id;
 		const device = await Devices.find({"_id": getdevice}).exec();
 
 		res.status(201).json({
