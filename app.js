@@ -134,7 +134,9 @@ app.post('/api/v1/user/login', async (req, res) => {
 
     }).status(201);
 
-    res.status(201).json({
+	const data = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
+	
+	res.json({
 	 	"success": true,
 	 	"message": 'User logged in successfully.',
 	 	data
