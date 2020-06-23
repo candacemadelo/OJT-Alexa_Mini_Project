@@ -379,7 +379,7 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 //Command Control API
 app.post("/api/v1/device/commandControl", async (req, res) => {
 
-	console.log(req);
+	// console.log(req);
 
 	var devToken = req.query.token;
 
@@ -392,6 +392,7 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 
 		const commandDevice = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
 			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
+		console.log(commandDevice);
 		const getdevice = "" + commandDevice._id;
 		const device = await Devices.find({"_id": getdevice}).exec();
 
