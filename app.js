@@ -388,6 +388,41 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 	}
 });
 
+//Command Control API
+app.post("/api/v1/device/commandControl", async (req, res) => {
+
+	console.log(req);
+
+	var devToken = req.query.token;
+
+	try {
+		const getDevToken = req.body.tokenId;
+		const devPowStat  = req.body.power_status;
+		const getTemp 	  = req.body.temperature;
+		const getMode     = req.body.mode;
+		const getEndpoint = req.body.endpointId;
+
+		const device = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
+			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
+		console.log(device);
+
+		res.status(201).json({
+			"success" : true,
+			"message" : "Command Success!",
+			device
+		});
+
+
+	} catch(err) {
+		console.log(err);
+		res.status(400).json ({
+	 		"success" : false,
+			"message" : "Command Failed."
+		});
+	}
+});
+
+
 //Get device status
 app.get("/api/v1/device/getStates", async (req, res) => {
 	
@@ -450,48 +485,13 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 });
 
 
-//Command Control API
-app.post("/api/v1/device/commandControl", async (req, res) => {
-
-	console.log(req);
-
-	var devToken = req.query.token;
-
-	try {
-		const getDevToken = req.body.tokenId;
-		const devPowStat  = req.body.power_status;
-		const getTemp 	  = req.body.temperature;
-		const getMode     = req.body.mode;
-		const getEndpoint = req.body.endpointId;
-
-		const device = await Devices.findOneAndUpdate({"tokenId" : getDevToken, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
-			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
-		console.log(device);
-
-		res.status(201).json({
-			"success" : true,
-			"message" : "Command Success!",
-			device
-		});
-
-
-	} catch(err) {
-		console.log(err);
-		res.status(400).json ({
-	 		"success" : false,
-			"message" : "Command Failed."
-		});
-	}
-});
-
-
 //Delete Device API
 app.post("/api/v1/device/deleteDevice", async(req, res) => {
 	var deleteDevTok    = req.query.token,
 	    deleteEndpoint  = req.query.endpoint;
 
 	try {
-		const delDevice = await Devices.findByIdAndRemove({"_id": selectedDevice}).exec();
+		const delDevice = await Devices.findByIdAndRemove({"tokenId": deleteDevTok, "endpointId": deleteEndpoint}).exec();
 
 		res.status(201).json({
 			"success" : true,
