@@ -132,34 +132,31 @@ app.post('/api/v1/user/login', async (req, res) => {
         maxAge:  2 * 60 * 60 * 1000, // 2 hours,
         secure: process.env.NODE_ENV === 'production',
 
-    }).status(201);
-
-	// const datas = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();
-
+	}).status(201);
 	
+		const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
 
-	const tok = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).exec();
-	console.log(tok);
+		for(var i = 0; i < getToken.length; i++) {
+			var devUser = getToken[i].user;
+		}
+		console.log(devUser._id);
 
-	for(var i = 0; i < tok.length; i++) {
-		var devUser = tok[i].accessToken;
-	}
-	console.log(devUser);
-	const getUserToken = "" + devUser;
-	console.log(getUserToken);
-	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
+		const getUserToken = "" + devUser._id;
 
-	res.json({
-		data
-	});
+		const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+	"power_status":1, "mode":1}).exec();
 
-	console.log(data);
-	const getUserDevice = JSON.parse(data);
-	res.render('home', {getUserDevice: JSON.stringify(getUserDevice)});
+		console.log(data);
+		res.render('home', {datas: data, getToken: getToken});
+
+		// res.json({
+		// 	"success": true,
+		// 	"message": 'User logged in successfully.',
+		// 	getToken
+		// });
 
     } catch (err) {
 
-    console.log(err);
     res.status(400).json({
 	      errors: [
 	        {
@@ -308,7 +305,6 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 
 		const data = await Devices.find({"userId": infoUser}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1}).exec();
 		console.log(data);
-		
 	
 		var endpoints = [];
 		for(i = 0; i < data.length; i++) {
@@ -372,6 +368,8 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		}	
 
 		res.status(201).json({
+			"success": true,
+	     	"message": "Found data",
 			endpoints
 		});
 
@@ -441,7 +439,6 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 	}
 });
 
-
 //Get device status
 app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
@@ -498,6 +495,8 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			});
 		}
 		res.status(201).json({
+			"success": true,
+	     	"message": "Found data",
 			endpoints
 		});
 
