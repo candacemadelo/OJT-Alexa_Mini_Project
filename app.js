@@ -134,26 +134,23 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	}).status(201);
 	
-		const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
+	const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
 
-		for(var i = 0; i < getToken.length; i++) {
-			var devUser = getToken[i].user;
-		}
-		console.log(devUser._id);
+	for(var i = 0; i < getToken.length; i++) {
+		var devUser = getToken[i].user;
+	}
 
-		const getUserToken = "" + devUser._id;
+	const getUserToken = "" + devUser._id;
+	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+									"power_status":1, "mode":1}).exec();
 
-		const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
-	"power_status":1, "mode":1}).exec();
+	res.render('home', {datas: data, getToken: getToken});
 
-		console.log(data);
-		res.render('home', {datas: data, getToken: getToken});
-
-		// res.json({
-		// 	"success": true,
-		// 	"message": 'User logged in successfully.',
-		// 	getToken
-		// });
+	res.json({
+		"success": true,
+		"message": 'User logged in successfully.',
+		getToken
+	});
 
     } catch (err) {
 
