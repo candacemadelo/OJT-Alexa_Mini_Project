@@ -142,7 +142,7 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	const getUserToken = "" + devUser._id;
 	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
-									"power_status":1, "mode":1, "tokenId":1, "endpointId":1}).exec();
+									"power_status":1, "mode":1, "tokenId":1}).exec();
 
 	res.json({
 		"success": true,
