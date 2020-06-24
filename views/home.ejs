@@ -7,11 +7,12 @@
         <div class="card-image grey darken-3">
           <img src="https://lh3.googleusercontent.com/proxy/Zo3YHFdl72HdClnleLT9smhPTZoaC-BKN28WuxFWYKmWD6JA-iGqHfb3i73-XyBU4KnJOR7dyRRAKirp6dYBDX0iJSEGxvh2qRwLCKZP46CyW_NQw_pJDMTH" alt="">
           <h4 class="center white-text">THERMOSTATS</h4><br>
-          <a href="/api/v1/device/addDevice" class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
+          <a href="/api/v1/device/addDevice/" class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
         </div>
         <div class="card-content">
           <div class="row">
             <div class="col s12 m12">
+              <form id="form" data-flag="0" action="/api/v1/device/commandControl/" method="POST">
               <% datas.forEach(function(data){%>
               <div class="card grey darken-4 white-text">
                 <div class="card-content white-text">
@@ -21,6 +22,17 @@
                     </div>
                     <span class="left"><%= data.temperature %>° - <%= data.mode %></span>
                     <span class="right">
+                      <% if( data.power_status == 1) {%>
+                      <div class="switch">
+                        <label>
+                          Off
+                          <input type="checkbox" checked>
+                          <span class="lever"></span>
+                          On
+                        </label>
+                      </div>
+                      <% } %>
+                      <% if( data.power_status == 0) {%>
                       <div class="switch">
                         <label>
                           Off
@@ -29,23 +41,31 @@
                           On
                         </label>
                       </div>
+                      <% } %>
                     </span>
                   </span>
                   <br>
                 </div>
                 <div class="card-action">
                   <div class="row center">
-                    <a class="waves-effect waves-light btn blue"><i class="material-icons left">ac_unit</i>COOL</a>
-                    <a class="waves-effect waves-light btn red"><i class="material-icons left">whatshot</i>HEAT</a>
+                    <a class="waves-effect waves-light btn blue" id="cool"><i class="material-icons left">ac_unit</i>COOL</a>
+                    <a class="waves-effect waves-light btn red" id="heat"><i class="material-icons left">whatshot</i>HEAT</a>
                   </div>
                   <div class="row center">
-                    <a class="center btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
-                    <a class="center btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a> 
-                    <a class="waves-effect waves-light btn green"><i class="material-icons left">check</i>SET</a> 
+                    <div class="col s4"></div>
+                    <div class="col s4"><input class="white-text" type="text" name="temperature"></div>
+                    <div class="col s4"></div>
+                  </div>
+                  <div class="row center">
+                    <button type="submit" class="waves-effect waves-light btn green" id="confirm"><i class="material-icons left">check</i>SET</button>
                   </div>
                 </div>
+                <input class="white-text" type="text" hidden id="mode" name="mode" value="">
+                <input class="white-text" type="text" hidden name="token" value="<%= data.tokenId %>">
+                <input class="white-text" type="text" hidden name="endpointId" value="<%= data.endpointId %>">
               </div>
               <% }) %>
+            </form>
             </div>
           </div>
         </div>
