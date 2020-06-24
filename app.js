@@ -134,15 +134,15 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	}).status(201);
 	
-		const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
-		// const AccessToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();	
+	const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
 
-		for(var i = 0; i < getToken.length; i++) {
-			var devUser = getToken[i].user;
-		}
-		console.log(devUser);
+	for(var i = 0; i < getToken.length; i++) {
+		var devUser = getToken[i].user;
+	}
 
-		const getUserToken = "" + devUser._id;
+	const getUserToken = "" + devUser._id;
+	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+									"power_status":1, "mode":1}).exec();
 
 		const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 	"power_status":1, "mode":1, "tokenId": 1}).exec();
@@ -368,8 +368,6 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 		}	
 
 		res.status(201).json({
-			"success": true,
-	     	"message": "Found data",
 			endpoints
 		});
 
@@ -443,10 +441,10 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
 	try{
-		var getToken = req.query.token;
-		console.log(getToken);
+		var getToken    = req.query.token;
+		var getEndpoint = req.query.endpointId;
 
-		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
+		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"_id":0, "user": 1}).exec();
 		console.log(deviceToken);
 
 		for(var i = 0; i < deviceToken.length; i++) {
@@ -456,7 +454,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const infoUser = "" + devUser;
 		console.log(infoUser);
 
-		const data = await Devices.find({"tokenID": token}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		const data = await Devices.find({"userId": infoUser, "endpointId": getEndpoint}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
@@ -466,38 +464,37 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var temperature = data[i].temperature;
 			var powerState = data[i].power_status;
 
-			context.push({	
-				"properties": [
-		            {
-		                "namespace": "Alexa.ThermostatController",
-		                "name": "thermostatMode",
-		                "value": thermostatMode,
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.ThermostatController",
-		                "name": "targetSetpoint",
-		                "value": {
-		                  "value": temperature,
-		                  "scale": "CELSIUS"
-		                },
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.PowerController",
-		                "name": "powerState",
-		                "value": powerState,
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            }]
+			properties.push({	
+				{
+					"namespace": "Alexa.ThermostatController",
+					"name": "thermostatMode",
+					"value": thermostatMode,
+					"timeOfSample": timeNow,
+					"uncertaintyInMilliseconds": 500
+				},
+				{
+					"namespace": "Alexa.ThermostatController",
+					"name": "targetSetpoint",
+					"value": {
+						"value": temperature,
+						"scale": "CELSIUS"
+					},
+					"timeOfSample": timeNow,
+					"uncertaintyInMilliseconds": 500
+				},
+				{
+					"namespace": "Alexa.PowerController",
+					"name": "powerState",
+					"value": powerState,
+					"timeOfSample": timeNow,
+					"uncertaintyInMilliseconds": 500
+				}
 			});
 		}
+
+
 		res.status(201).json({
-			"success": true,
-	     	"message": "Found data",
-			endpoints
+			properties
 		});
 
 	} catch(err) {
