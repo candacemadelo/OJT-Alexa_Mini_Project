@@ -142,7 +142,7 @@ app.post('/api/v1/user/login', async (req, res) => {
 
 	const getUserToken = "" + devUser._id;
 	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
-									"power_status":1, "mode":1}).exec();
+									"power_status":1, "mode":1, "tokenId":1, "endpointId":1}).exec();
 
 	res.json({
 		"success": true,
@@ -150,7 +150,7 @@ app.post('/api/v1/user/login', async (req, res) => {
 		getToken
 	});
 
-	res.render('home', {datas: data, getToken: getToken});
+	res.render('home', {datas: data});
 
     } catch (err) {
 
@@ -428,8 +428,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
 	try{
 		var getToken    = req.query.token;
-		var getEndpoint = req.query.endpointID
-		console.log(getToken);
+		var getEndpoint = req.query.endpointId;
 
 		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"_id":0, "user": 1}).exec();
 		console.log(deviceToken);
@@ -441,7 +440,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const infoUser = "" + devUser;
 		console.log(infoUser);
 
-		const data = await Devices.find({"userId": infoUser}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		const data = await Devices.find({"userId": infoUser, "endpointId": getEndpoint}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
@@ -451,38 +450,38 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var temperature = data[i].temperature;
 			var powerState = data[i].power_status;
 
-			context.push({	
-				"properties": [
-		            {
-		                "namespace": "Alexa.ThermostatController",
-		                "name": "thermostatMode",
-		                "value": thermostatMode,
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.ThermostatController",
-		                "name": "targetSetpoint",
-		                "value": {
-		                  "value": temperature,
-		                  "scale": "CELSIUS"
-		                },
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.PowerController",
-		                "name": "powerState",
-		                "value": powerState,
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            }]
+			properties.push({	
+				[
+					{
+						"namespace": "Alexa.ThermostatController",
+						"name": "thermostatMode",
+						"value": thermostatMode,
+						"timeOfSample": timeNow,
+						"uncertaintyInMilliseconds": 500
+					},
+					{
+						"namespace": "Alexa.ThermostatController",
+						"name": "targetSetpoint",
+						"value": {
+							"value": temperature,
+							"scale": "CELSIUS"
+						},
+						"timeOfSample": timeNow,
+						"uncertaintyInMilliseconds": 500
+					},
+					{
+						"namespace": "Alexa.PowerController",
+						"name": "powerState",
+						"value": powerState,
+						"timeOfSample": timeNow,
+						"uncertaintyInMilliseconds": 500
+					}
+				]
 			});
 		}
 
-
 		res.status(201).json({
-			context
+			properties
 		});
 
 	} catch(err) {
@@ -505,6 +504,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		console.log(err);
 	}
 });
+
 
 //Delete Device API
 app.post("/api/v1/device/deleteDevice", async(req, res) => {
