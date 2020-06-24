@@ -57,10 +57,13 @@
                     <div class="col s4"></div>
                   </div>
                   <div class="row center">
+                    <a class="center btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
+                    <a class="center btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a> 
                     <button type="submit" class="waves-effect waves-light btn green" id="confirm"><i class="material-icons left">check</i>SET</button>
                   </div>
                 </div>
                 <input class="white-text" type="text" hidden id="mode" name="mode" value="">
+                <input class="white-text" type="text" hidden id="mode" name="mode" value="<%= data.mode %>">
                 <input class="white-text" type="text" hidden name="token" value="<%= data.tokenId %>">
                 <input class="white-text" type="text" hidden name="endpointId" value="<%= data.endpointId %>">
               </div>
