@@ -438,8 +438,8 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
 	try{
-		var getToken = req.query.token;
-		console.log(getToken);
+		var getToken    = req.query.token;
+		var getEndpoint = req.query.endpointID;
 
 		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"_id":0, "user": 1}).exec();
 		console.log(deviceToken);
@@ -451,7 +451,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const infoUser = "" + devUser;
 		console.log(infoUser);
 
-		const data = await Devices.find({"userId": infoUser}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		const data = await Devices.find({"userId": infoUser, "endpointId": getEndpoint}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
