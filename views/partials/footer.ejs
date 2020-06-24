@@ -4,31 +4,14 @@
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script type="text/javascript">
         $(document).ready(function(){
-           $('.collapsible').collapsible();
-
-           var elem = document.querySelector('.collapsible.expandable');
-                var instance = M.Collapsible.init(elem, {
-                accordion: false
+            $('#cool').on("click", function(e){
+               $('#mode').val("COOL");
             });
 
-            $("div.collapsible-header").on("click",function(event) {
-                var target = $(event.target);
-                if (target.is('input:checkbox')) return;
-
-                $("#accordion").each(function(){
-                    var checkbox = $(this).find("input[type='checkbox']");
-                    checkbox.prop("checked",false);
-                })
-                var checkbox = $(this).find("input[type='checkbox']");
-                if( !checkbox.prop("checked") ){
-                    checkbox.prop("checked",true);
-                } else {
-                    checkbox.prop("checked",false);
-                }
-            }); 
+            $('#heat').on("click", function(e){
+               $('#mode').val("HEAT");
+            });
          });
-
-
     </script>
     </body>
 </html>
