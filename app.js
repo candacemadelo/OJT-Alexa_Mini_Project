@@ -144,7 +144,7 @@ app.post('/api/v1/user/login', async (req, res) => {
 	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 									"power_status":1, "mode":1}).exec();
 
-	res.render('home', {datas: data, getToken: getToken});
+	// res.render('home', {datas: data, getToken: getToken});
 
 	res.json({
 		"success": true,
@@ -441,7 +441,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		var getToken = req.query.token;
 		console.log(getToken);
 
-		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
+		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"_id":0, "user": 1}).exec();
 		console.log(deviceToken);
 
 		for(var i = 0; i < deviceToken.length; i++) {
@@ -451,7 +451,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const infoUser = "" + devUser;
 		console.log(infoUser);
 
-		const data = await Devices.find({"tokenID": getToken}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		const data = await Devices.find({"userId": infoUser}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
@@ -489,6 +489,8 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		            }]
 			});
 		}
+
+
 		res.status(201).json({
 			context
 		});
