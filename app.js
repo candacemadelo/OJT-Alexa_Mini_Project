@@ -178,20 +178,9 @@ app.post("/api/v1/user/register", async (req, res) => {
 	console.log(req);
 
 	try {
+	    
 	    const {firstName, lastName, email, password } = req.body;
-
 	    const user = new User({firstName, lastName, email, password });
-	    // const saveUser = await user.save();
-	    // const userInfo = saveUser._id;
-	    // //const session = await initializeSession(userInfo);
-	    // const currentUser = await User.find({_id: userInfo}).exec();
-
-	    // // res.cookie('token', session.token, {
-	    // // 	httpOnly: true,
-	    // //     sameSite: true,
-	    // //     maxAge:  2 * 60 * 60 * 1000, // 2 hours
-	    // //     secure: process.env.NODE_ENV === 'production',
-	    // // })
 
 	   const registerUser = new User(user);
 	    await registerUser.save((error) =>{
@@ -490,7 +479,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 				]
 			});
 		}
-		
+
 		res.status(201).json({
 			properties
 		});
