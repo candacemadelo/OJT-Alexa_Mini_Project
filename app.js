@@ -144,16 +144,13 @@ app.post('/api/v1/user/login', async (req, res) => {
 	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 									"power_status":1, "mode":1}).exec();
 
-		const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
-	"power_status":1, "mode":1, "tokenId": 1}).exec();
+	res.json({
+		"success": true,
+		"message": 'User logged in successfully.',
+		getToken
+	});
 
-		res.render('home', {datas: data});
-
-		// res.json({
-		// 	"success": true,
-		// 	"message": 'User logged in successfully.',
-		// 	getToken
-		// });
+	res.render('home', {datas: data, getToken: getToken});
 
     } catch (err) {
 
@@ -465,34 +462,35 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var powerState = data[i].power_status;
 
 			properties.push({	
-				{
-					"namespace": "Alexa.ThermostatController",
-					"name": "thermostatMode",
-					"value": thermostatMode,
-					"timeOfSample": timeNow,
-					"uncertaintyInMilliseconds": 500
-				},
-				{
-					"namespace": "Alexa.ThermostatController",
-					"name": "targetSetpoint",
-					"value": {
-						"value": temperature,
-						"scale": "CELSIUS"
+				[
+					{
+						"namespace": "Alexa.ThermostatController",
+						"name": "thermostatMode",
+						"value": thermostatMode,
+						"timeOfSample": timeNow,
+						"uncertaintyInMilliseconds": 500
 					},
-					"timeOfSample": timeNow,
-					"uncertaintyInMilliseconds": 500
-				},
-				{
-					"namespace": "Alexa.PowerController",
-					"name": "powerState",
-					"value": powerState,
-					"timeOfSample": timeNow,
-					"uncertaintyInMilliseconds": 500
-				}
+					{
+						"namespace": "Alexa.ThermostatController",
+						"name": "targetSetpoint",
+						"value": {
+							"value": temperature,
+							"scale": "CELSIUS"
+						},
+						"timeOfSample": timeNow,
+						"uncertaintyInMilliseconds": 500
+					},
+					{
+						"namespace": "Alexa.PowerController",
+						"name": "powerState",
+						"value": powerState,
+						"timeOfSample": timeNow,
+						"uncertaintyInMilliseconds": 500
+					}
+				]
 			});
 		}
-
-
+		
 		res.status(201).json({
 			properties
 		});
