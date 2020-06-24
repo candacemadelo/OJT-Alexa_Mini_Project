@@ -274,11 +274,11 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 app.get("/api/v1/device/getDevice", async (req, res) => {
 
 	console.log(req);
+	var getToken = req.query.token;
+	console.log(getToken);
 
 	try{
-		var getToken = req.query.token;
-		console.log(getToken);
-
+		
 		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"user": 1, "_id":0}).exec();
 		console.log(deviceToken);
 
