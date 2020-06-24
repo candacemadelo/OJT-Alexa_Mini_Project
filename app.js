@@ -135,19 +135,19 @@ app.post('/api/v1/user/login', async (req, res) => {
 	}).status(201);
 	
 		const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
+		// const AccessToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1}).populate("user").exec();	
 
 		for(var i = 0; i < getToken.length; i++) {
 			var devUser = getToken[i].user;
 		}
-		console.log(devUser._id);
+		console.log(devUser);
 
 		const getUserToken = "" + devUser._id;
 
 		const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
-	"power_status":1, "mode":1}).exec();
+	"power_status":1, "mode":1, "tokenId": 1}).exec();
 
-		console.log(data);
-		res.render('home', {datas: data, getToken: getToken});
+		res.render('home', {datas: data});
 
 		// res.json({
 		// 	"success": true,
