@@ -428,7 +428,8 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
 	try{
 		var getToken    = req.query.token;
-		var getEndpoint = req.query.endpointId;
+		var getEndpoint = req.query.endpointID
+		console.log(getToken);
 
 		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"_id":0, "user": 1}).exec();
 		console.log(deviceToken);
@@ -440,7 +441,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const infoUser = "" + devUser;
 		console.log(infoUser);
 
-		const data = await Devices.find({"userId": infoUser, "endpointId": getEndpoint}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		const data = await Devices.find({"userId": infoUser}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
@@ -450,38 +451,38 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var temperature = data[i].temperature;
 			var powerState = data[i].power_status;
 
-			properties.push({	
-				[
-					{
-						"namespace": "Alexa.ThermostatController",
-						"name": "thermostatMode",
-						"value": thermostatMode,
-						"timeOfSample": timeNow,
-						"uncertaintyInMilliseconds": 500
-					},
-					{
-						"namespace": "Alexa.ThermostatController",
-						"name": "targetSetpoint",
-						"value": {
-							"value": temperature,
-							"scale": "CELSIUS"
-						},
-						"timeOfSample": timeNow,
-						"uncertaintyInMilliseconds": 500
-					},
-					{
-						"namespace": "Alexa.PowerController",
-						"name": "powerState",
-						"value": powerState,
-						"timeOfSample": timeNow,
-						"uncertaintyInMilliseconds": 500
-					}
-				]
+			context.push({	
+				"properties": [
+		            {
+		                "namespace": "Alexa.ThermostatController",
+		                "name": "thermostatMode",
+		                "value": thermostatMode,
+		                "timeOfSample": timeNow,
+		                "uncertaintyInMilliseconds": 500
+		            },
+		            {
+		                "namespace": "Alexa.ThermostatController",
+		                "name": "targetSetpoint",
+		                "value": {
+		                  "value": temperature,
+		                  "scale": "CELSIUS"
+		                },
+		                "timeOfSample": timeNow,
+		                "uncertaintyInMilliseconds": 500
+		            },
+		            {
+		                "namespace": "Alexa.PowerController",
+		                "name": "powerState",
+		                "value": powerState,
+		                "timeOfSample": timeNow,
+		                "uncertaintyInMilliseconds": 500
+		            }]
 			});
 		}
 
+
 		res.status(201).json({
-			properties
+			context
 		});
 
 	} catch(err) {
