@@ -461,38 +461,37 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var temperature = data[i].temperature;
 			var powerState = data[i].power_status;
 
-			context.push({	
-				"properties": [
-		            {
-		                "namespace": "Alexa.ThermostatController",
-		                "name": "thermostatMode",
-		                "value": thermostatMode,
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.ThermostatController",
-		                "name": "targetSetpoint",
-		                "value": {
-		                  "value": temperature,
-		                  "scale": "CELSIUS"
-		                },
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            },
-		            {
-		                "namespace": "Alexa.PowerController",
-		                "name": "powerState",
-		                "value": powerState,
-		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 500
-		            }]
+			properties.push({	
+				{
+					"namespace": "Alexa.ThermostatController",
+					"name": "thermostatMode",
+					"value": thermostatMode,
+					"timeOfSample": timeNow,
+					"uncertaintyInMilliseconds": 500
+				},
+				{
+					"namespace": "Alexa.ThermostatController",
+					"name": "targetSetpoint",
+					"value": {
+						"value": temperature,
+						"scale": "CELSIUS"
+					},
+					"timeOfSample": timeNow,
+					"uncertaintyInMilliseconds": 500
+				},
+				{
+					"namespace": "Alexa.PowerController",
+					"name": "powerState",
+					"value": powerState,
+					"timeOfSample": timeNow,
+					"uncertaintyInMilliseconds": 500
+				}
 			});
 		}
 
 
 		res.status(201).json({
-			context
+			properties
 		});
 
 	} catch(err) {
