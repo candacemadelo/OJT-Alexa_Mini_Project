@@ -490,7 +490,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			});
 		}
 		res.status(201).json({
-			context;
+			context
 		});
 
 	} catch(err) {
