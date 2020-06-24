@@ -144,13 +144,13 @@ app.post('/api/v1/user/login', async (req, res) => {
 	const data = await Devices.find({"userId": getUserToken}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 									"power_status":1, "mode":1}).exec();
 
-	// res.render('home', {datas: data, getToken: getToken});
-
 	res.json({
 		"success": true,
 		"message": 'User logged in successfully.',
 		getToken
 	});
+
+	res.render('home', {datas: data, getToken: getToken});
 
     } catch (err) {
 
@@ -439,7 +439,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
 	try{
 		var getToken    = req.query.token;
-		var getEndpoint = req.query.endpointID;
+		var getEndpoint = req.query.endpointId;
 
 		const deviceToken = await AccessToken.find({"accessToken":getToken}, {"_id":0, "user": 1}).exec();
 		console.log(deviceToken);
