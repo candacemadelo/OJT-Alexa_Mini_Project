@@ -456,7 +456,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		const infoUser = "" + devUser;
 		console.log(infoUser);
 
-		const data = await Devices.find({"tokenID": token}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
+		const data = await Devices.find({"tokenID": getToken}, {"_id":0, "power_status": 1, "temperature": 1, "mode":1}).exec();
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
