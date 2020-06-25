@@ -7,7 +7,7 @@
         <div class="card-image grey darken-3">
           <img src="https://lh3.googleusercontent.com/proxy/Zo3YHFdl72HdClnleLT9smhPTZoaC-BKN28WuxFWYKmWD6JA-iGqHfb3i73-XyBU4KnJOR7dyRRAKirp6dYBDX0iJSEGxvh2qRwLCKZP46CyW_NQw_pJDMTH" alt="">
           <h4 class="center white-text">THERMOSTATS</h4><br>
-          <a href="/api/v1/device/addDevice/" class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
+          <a href="/api/v1/device/addDevice/<%= token %>" class="btn-floating halfway-fab waves-effect waves-light red"><i class="material-icons">add</i></a>
         </div>
         <div class="card-content">
           <div class="row">
@@ -23,25 +23,13 @@
                     <span class="left"><%= data.temperature %>° - <%= data.mode %></span>
                     <span class="right">
                       <% if( data.power_status == 1) {%>
-                      <div class="switch">
-                        <label>
-                          Off
-                          <input type="checkbox" checked>
-                          <span class="lever"></span>
-                          On
-                        </label>
-                      </div>
+                        <span>ON</span>
+                        <button type="submit" class="btn-floating waves-effect waves-light btn green" id="confirm"><i class="material-icons left">power_settings_new</i></button>
                       <% } %>
                       <% if( data.power_status == 0) {%>
-                      <div class="switch">
-                        <label>
-                          Off
-                          <input type="checkbox">
-                          <span class="lever"></span>
-                          On
-                        </label>
-                      </div>
-                      <% } %>
+                        <span>OFF</span>
+                        <button type="submit" class="btn-floating waves-effect waves-light btn red" id="confirm"><i class="material-icons left">power_settings_new</i></button>
+                      <% } %>                
                     </span>
                   </span>
                   <br>
@@ -53,7 +41,7 @@
                   </div>
                   <div class="row center">
                     <div class="col s4"></div>
-                    <div class="col s4"><input class="white-text" type="text" name="temperature"></div>
+                    <div class="col s4"><input class="white-text valign center" type="text" name="temperature"></div>
                     <div class="col s4"></div>
                   </div>
                   <div class="row center">
@@ -62,7 +50,7 @@
                     <button type="submit" class="waves-effect waves-light btn green" id="confirm"><i class="material-icons left">check</i>SET</button>
                   </div>
                 </div>
-                <input class="white-text" type="text" hidden id="mode" name="mode" value="">
+                <input class="white-text" type="text" hidden id="token" name="mode" value="<%= token %>">
                 <input class="white-text" type="text" hidden id="mode" name="mode" value="<%= data.mode %>">
                 <input class="white-text" type="text" hidden name="token" value="<%= data.tokenId %>">
                 <input class="white-text" type="text" hidden name="endpointId" value="<%= data.endpointId %>">
