@@ -9,7 +9,7 @@
           <h4 class="center white-text">ADD NEW DEVICE</h4><br>
         </div>
         <div class="card-content">
-          <form action="/api/v1/device/addNewDevice" method="POST">
+          <form action="/api/v1/device/addNewDevice/?token=<%= token %>" method="POST">
             <div class="row">
               <div class="input-field col s12">
                 <i class="material-icons prefix">description</i>
@@ -18,18 +18,18 @@
               </div>
               <div class="input-field col s12">
                 <i class="material-icons prefix">build</i>
-                <input id="icon_prefix" type="text" class="validate" name="manufacturer" required>
+                <input id="icon_prefix" type="text" class="validate" name="manufacturerName" required>
                 <label for="icon_prefix">Manufacturer Name</label>
               </div>
               <div class="input-field col s12">
                 <i class="material-icons prefix">devices</i>
-                <input id="icon_prefix" type="text" class="validate" name="name" required>
+                <input id="icon_prefix" type="text" class="validate" name="friendlyName" required>
                 <label for="icon_prefix">Friendly Name</label>
               </div>
             </div>
             <div class="row">
               <div class="col s12 m12 l12">
-                <a href="/api/v1/user/home" class="left btn red waves-effect waves-light btn-large col s5">CANCEL<i class="material-icons right">cancel</i></a> 
+                <a href="/api/v1/user/home/<%= token %>" class="left btn red waves-effect waves-light btn-large col s5">CANCEL<i class="material-icons right">cancel</i></a> 
                 <button class="right btn waves-effect waves-light btn-large col s5" type="submit" name="action">SAVE
                   <i class="material-icons right">library_add</i>
                 </button>
