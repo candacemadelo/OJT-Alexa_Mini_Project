@@ -271,23 +271,15 @@ app.get('/api/v1/user/home/:token', async function(req, res) {
 
 	for(var i = 0; i < deviceToken.length; i++) {
 		var devUser = deviceToken[i].user;
-		var token = deviceToken[i].accessToken;
 	}
 	//render back to home
 
 	const getUserID = "" + devUser._id;
-	const getTokenID = "" + token;
 
 	const datas = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 									"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
 
-	// res.json({
-	// 	"success": true,
-	// 	"message": 'User logged in successfully.',
-	// 	getToken
-	// });
-
-	res.render('home', {datas: datas, token: getTokenID});
+	res.render('home', {datas: datas, token: getToken});
 });
 
 //add new device route
@@ -333,12 +325,6 @@ app.post("/api/v1/device/addNewDevice", async (req, res) => {
 		const datas = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
 
-		// res.json({
-		// 	"success": true,
-		// 	"message": 'User logged in successfully.',
-		// 	getToken
-		// });
-
 		res.render('home', {datas: datas, token: getTokenID});
 
 	} catch(err) {
@@ -363,39 +349,38 @@ app.post("/api/v1/device/addNewDevice", async (req, res) => {
 });
 
 //Power Status API
-app.post("/api/v1/device/Power", async (req, res) => {
-
-	var devToken = req.query.token;
+app.post("/api/v1/device/Power/:endpointId", async (req, res) => {
 
 	try {
-		const getDevToken = req.body.tokenId;
-		const devPowStat  = req.body.power_status;
-		const getTemp 	  = req.body.temperature;
-		const getMode     = req.body.mode;
-		const getEndpoint = req.body.endpointId;
+		const getToken = req.body.tokenId;
+		const powerStat  = req.body.power_status;
+		const getEndpoint = req.params.endpointId;
+		var newPowerStats = 0;
 
-		const commandDevice = await AccessToken.find({"accessToken": getDevToken}, {"_id": 0, "user": 1}).exec();
+		if(powerStat == 1){
+			newPowerStats = 0;
+		} else {
+			newPowerStats = 1;
+		}
+
+		const commandDevice = await AccessToken.find({"accessToken": getToken}, {"_id": 0, "user": 1}).exec();
 		console.log(commandDevice);
 
 		for(var i = 0; i < commandDevice.length; i++) {
 			var userDev = commandDevice[i].user;
 		}
 
-		const getUser = "" + userDev;
-		console.log(getUser);
+		const getUserID = "" + userDev;
+		console.log(getUserID);
+		//update power status
+		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUserID, "endpointId": getEndpoint}, 
+		{$set: {"power_status": newPowerStats}}, { returnNewDocument: true }).exec();
 
-		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUser, "endpointId": getEndpoint}, {$set: {"power_status": devPowStat, 
-			                                           "temperature": getTemp, "mode": getMode}}, { returnNewDocument: true }).exec();
-		console.log(getUserDevice);
-		const getdevice = "" + getUserDevice._id;
-		const device = await Devices.find({"_id": getdevice}).exec();
+		//render back to home
+		const datas = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
 
-		res.status(201).json({
-			"success" : true,
-			"message" : "Command Success!",
-			device
-		});
-
+		res.render('home', {datas: datas, token: getToken});
 
 	} catch(err) {
 		console.log(err);
