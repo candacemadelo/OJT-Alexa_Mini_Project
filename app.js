@@ -310,7 +310,7 @@ app.post("/api/v1/device/addNewDevice", async (req, res) => {
 		       friendlyName} = req.body;
 
 		const deviceList = new Devices({userId: infoUser, tokenId: getToken, power_status: 0 , temperature : 0, 
-										mode: "undefined", endpointId:uniq, description, manufacturerName,
+										mode: "COOL", endpointId:uniq, description, manufacturerName,
 		       							friendlyName});
 
 		const saveDeviceList = await deviceList.save();
@@ -375,6 +375,93 @@ app.post("/api/v1/device/Power/:endpointId", async (req, res) => {
 		//update power status
 		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUserID, "endpointId": getEndpoint}, 
 		{$set: {"power_status": newPowerStats}}, { returnNewDocument: true }).exec();
+
+		//render back to home
+		const datas = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
+
+		res.render('home', {datas: datas, token: getToken});
+
+	} catch(err) {
+		console.log(err);
+		res.status(400).json ({
+	 		"success" : false,
+			"message" : "Command Failed."
+		});
+	}
+});
+
+//Mode API
+app.post("/api/v1/device/Mode/:mode/:endpointId", async (req, res) => {
+
+	try {
+		const getToken = req.body.tokenId;
+		const devMode  = req.params.mode;
+		const getEndpoint = req.params.endpointId;
+		var newMode = "";
+
+		console.log("Current Mode: "+devMode);
+		console.log("Endpoint: "+getEndpoint);
+
+		if(devMode == "COOL"){
+			newMode = "HEAT";
+		} 
+		if(devMode == "HEAT"){
+			newMode = "COOL";
+		}
+		if(devMode == "undefined"){
+
+		}
+
+		const commandDevice = await AccessToken.find({"accessToken": getToken}, {"_id": 0, "user": 1}).exec();
+		// console.log(commandDevice);
+
+		for(var i = 0; i < commandDevice.length; i++) {
+			var userDev = commandDevice[i].user;
+		}
+
+		const getUserID = "" + userDev;
+		// console.log(getUserID);
+		//update power status
+		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUserID, "endpointId": getEndpoint}, 
+		{$set: {"mode": newMode}}, { returnNewDocument: true }).exec();
+
+		//render back to home
+		const datas = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
+
+		res.render('home', {datas: datas, token: getToken});
+
+	} catch(err) {
+		console.log(err);
+		res.status(400).json ({
+	 		"success" : false,
+			"message" : "Command Failed."
+		});
+	}
+});
+
+//Temperature API
+app.post("/api/v1/device/Temp/:endpointId", async (req, res) => {
+
+	try {
+		const getToken = req.body.tokenId;
+		const devTemp  = req.body.temperature;
+		const getEndpoint = req.params.endpointId;
+		console.log("Temperature: "+devTemp);
+
+		const commandDevice = await AccessToken.find({"accessToken": getToken}, {"_id": 0, "user": 1}).exec();
+		// console.log(commandDevice);
+
+		for(var i = 0; i < commandDevice.length; i++) {
+			var userDev = commandDevice[i].user;
+		}
+
+		const getUserID = "" + userDev;
+		// console.log(getUserID);
+		//update power status
+		const getUserDevice = await Devices.findOneAndUpdate({"userId" : getUserID, "endpointId": getEndpoint}, 
+		{$set: {"temperature": devTemp}}, { returnNewDocument: true }).exec();
 
 		//render back to home
 		const datas = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
