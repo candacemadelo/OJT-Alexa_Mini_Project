@@ -3,15 +3,33 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function(){
-            $('#cool').on("click", function(e){
-               $('#mode').val("COOL");
-            });
+      $(document).ready(function(){
+         $(".up").click(function() {
+            var id = $(this).attr('id'); // $(this) refers to button that was clicked
 
-            $('#heat').on("click", function(e){
-               $('#mode').val("HEAT");
-            });
+            currentVal = $("#"+id).text();
+            newVal = parseInt(currentVal) + 1;
+
+            $("#"+id).text(newVal);
+            $("."+id).val(newVal);
          });
-    </script>
+
+         $(".down").click(function() {
+            var id = $(this).attr('id'); // $(this) refers to button that was clicked
+
+            currentVal = $("#"+id).text();
+            newVal = parseInt(currentVal) - 1;
+
+            if(newVal < 0){
+               $("#"+id).text(0);
+               $("."+id).val(0);
+            }
+            else{
+               $("#"+id).text(newVal);
+               $("."+id).val(newVal);
+            }
+         });
+      });
+   </script>
     </body>
 </html>
