@@ -19,7 +19,14 @@
                     <div class="row">
                       <%= data.friendlyName %>
                     </div>
-                    <span class="left"><%= data.temperature %>° - <%= data.mode %></span>
+                    <span class="left"><%= data.temperature %>° - 
+                      <% if( data.mode == "undefined") {%>
+                        <span>UNSET</span>
+                      <% } %>
+                      <% if( data.mode != "undefined") {%>
+                        <%= data.mode %>
+                      <% } %>
+                    </span>
                     <span class="right">
                       <form id="form" data-flag="0" action="/api/v1/device/Power/<%= data.endpointId %>" method="POST">
                         <% if( data.power_status == 1) {%>
@@ -31,7 +38,7 @@
                           <button type="submit" class="btn-floating waves-effect waves-light btn red" id="confirm"><i class="material-icons left">power_settings_new</i></button>
                         <% } %>
                         <input class="white-text" type="text" hidden id="token" name="tokenId" value="<%= token %>">
-                        <input class="white-text" type="text" hidden id="mode" name="power_status" value="<%= data.power_status %>">
+                        <input class="white-text" type="text" hidden id="status" name="power_status" value="<%= data.power_status %>">
                         <input class="white-text" type="text" hidden name="endpointId" value="<%= data.endpointId %>">
                       </form>           
                     </span>
@@ -40,25 +47,33 @@
                 </div>
                 <div class="card-action">
                   <div class="row center">
-                    <a class="waves-effect waves-light btn blue" id="cool"><i class="material-icons left">ac_unit</i>COOL</a>
-                    <a class="waves-effect waves-light btn red" id="heat"><i class="material-icons left">whatshot</i>HEAT</a>
+                    <form id="form" data-flag="0" action="/api/v1/device/Mode/<%= data.mode %>/<%= data.endpointId %>" method="POST">
+                      <% if( data.mode == "COOL") {%>
+                        <button type="submit" class="waves-effect waves-light btn blue disabled" id="cool"><i class="material-icons left">ac_unit</i>COOL</button>
+                        <button type="submit" class="waves-effect waves-light btn red" id="heat"><i class="material-icons left">whatshot</i>HEAT</button>
+                      <% } %>
+                      <% if( data.mode == "HEAT") {%>
+                        <button type="submit" class="waves-effect waves-light btn blue" id="cool"><i class="material-icons left">ac_unit</i>COOL</button>
+                        <button type="submit" class="waves-effect waves-light btn red disabled" id="heat"><i class="material-icons left">whatshot</i>HEAT</button>
+                      <% } %>
+                      <input class="white-text" type="text" hidden id="token" name="tokenId" value="<%= token %>">
+                    </form>
                   </div>
-                  <div class="row center">
-                    <div class="col s4"></div>
-                    <div class="col s4"><input class="white-text valign center" type="text" name="temperature"></div>
-                    <div class="col s4"></div>
-                  </div>
-                  <div class="row center">
-                    <a class="center btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_down</i></a>
-                    <a class="center btn-floating btn-medium waves-effect waves-light red"><i class="material-icons">keyboard_arrow_up</i></a> 
-                    <button type="submit" class="waves-effect waves-light btn green" id="confirm"><i class="material-icons left">check</i>SET</button>
-                  </div>
+                  <form id="form" data-flag="0" action="/api/v1/device/Temp/<%= data.endpointId %>" method="POST">
+                    <div class="row center">
+                      <div class="col s12 m12 l12">
+                        <h4><span class="center" name="temperature" id="<%= data.endpointId %>"><%= data.temperature %></span>°</h4>
+                        <input class="<%= data.endpointId %> white-text" name="temperature" type="text" hidden>
+                      </div>
+                    </div>
+                    <div class="row center">
+                      <a class="down center btn-floating btn-medium waves-effect waves-light red" id="<%= data.endpointId %>"><i class="material-icons">keyboard_arrow_down</i></a>
+                      <a class="up center btn-floating btn-medium waves-effect waves-light red" id="<%= data.endpointId %>"><i class="material-icons">keyboard_arrow_up</i></a> 
+                      <button type="submit" class="waves-effect waves-light btn green"><i class="material-icons left">check</i>SET</button>
+                    </div>
+                    <input class="white-text" type="text" hidden id="token" name="tokenId" value="<%= token %>">
+                  </form>
                 </div>
-                <input class="white-text" type="text" hidden id="token" name="tokenId" value="<%= token %>">
-                <input class="white-text" type="text" hidden id="mode" name="power_status" value="<%= data.power_status %>">
-                <input class="white-text" type="text" hidden id="mode" name="mode" value="<%= data.mode %>">
-                <input class="white-text" type="text" hidden name="token" value="<%= data.tokenId %>">
-                <input class="white-text" type="text" hidden name="endpointId" value="<%= data.endpointId %>">
               </div>
               <% }) %>
             </div>
