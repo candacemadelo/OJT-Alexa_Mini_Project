@@ -46,6 +46,7 @@
                   <br>
                 </div>
                 <div class="card-action">
+                  <% if( data.power_status == 1) {%>
                   <div class="row center">
                     <form id="form" data-flag="0" action="/api/v1/device/Mode/<%= data.mode %>/<%= data.endpointId %>" method="POST">
                       <% if( data.mode == "COOL") {%>
@@ -73,6 +74,7 @@
                     </div>
                     <input class="white-text" type="text" hidden id="token" name="tokenId" value="<%= token %>">
                   </form>
+                  <% } %>
                 </div>
               </div>
               <% }) %>
