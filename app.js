@@ -127,11 +127,23 @@ app.post('/api/v1/user/login', async (req, res) => {
 	
 	const getToken = await AccessToken.find({_id:sessionId}, {"_id": 0, "accessToken":1, "user":1}).populate("user").exec();
 
-	res.json({
-		"success": true,
-		"message": 'User logged in successfully.',
-		getToken
-	});
+		for(var i = 0; i < getToken.length; i++) {
+			var devUser = getToken[i].user;
+			var token = getToken[i].accessToken;
+		}
+
+		const getUserID = "" + devUser._id;
+		const getTokenID = "" + token;
+		const data = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
+										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
+
+		// res.json({
+		// 	"success": true,
+		// 	"message": 'User logged in successfully.',
+		// 	getToken
+		// });
+
+		res.render('home', {datas: data, token: getTokenID});
 
     } catch (err) {
 
@@ -522,8 +534,7 @@ app.post("/api/v1/device/deleteDevice", async(req, res) => {
 
 });
 
-
-//Web App Simulator------------------------------------------------------------------------------------------------
+-//Web App Simulator------------------------------------------------------------------------------------------------
 //home route
 app.get('/api/v1/user/home/:token', async function(req, res) {
 	var getToken = req.params.token;
