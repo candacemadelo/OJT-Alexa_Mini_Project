@@ -137,11 +137,11 @@ app.post('/api/v1/user/login', async (req, res) => {
 		const data = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
 
-		// res.json({
-		// 	"success": true,
-		// 	"message": 'User logged in successfully.',
-		// 	getToken
-		// });
+		res.json({
+			"success": true,
+			"message": 'User logged in successfully.',
+			getToken
+		});
 
 		res.render('home', {datas: data, token: getTokenID});
 
@@ -227,7 +227,7 @@ app.post("/api/v1/device/addDevice", async (req, res) => {
 		       friendlyName} = req.body;
 
 		const deviceList = new Devices({userId: infoUser, tokenId: getToken, power_status: 0 , temperature : 0, 
-										mode: "undefined", endpointId:uniq, description, manufacturerName,
+										mode: "COOL", endpointId:uniq, description, manufacturerName,
 		       							friendlyName});
 
 		const saveDeviceList = await deviceList.save();
