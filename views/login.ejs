@@ -1,47 +1,50 @@
 <%- include("partials/header") %>
-<div class="container" style="padding-top: 20px;">
+<div class="container"><br><br>
   <div class="row">
-    <div class="col s4"></div>
-    <div class="col s4 z-depth-5" style="background-size: cover; background-image: url('https://i.pinimg.com/originals/59/3f/a2/593fa20d2128f90ed60b29e268a4d082.jpg');">
-      <div class="card" >
-        <div class="card-image">
-          <div class="col s12" style="height: 225px;">
-            <center>
-              <img src="https://pngimage.net/wp-content/uploads/2018/06/simbolo-refrigera%C3%A7%C3%A3o-png-7.png" alt="" 
-            style="height: 250px; width: 250px;">
-            </center>
+    <div class="col s12 m3 l3"></div>
+    <div class="col s12 m3 l6">
+      <div class="card z-depth-5">
+        <div class="card-image grey darken-3">
+          <img src="https://lh3.googleusercontent.com/proxy/Zo3YHFdl72HdClnleLT9smhPTZoaC-BKN28WuxFWYKmWD6JA-iGqHfb3i73-XyBU4KnJOR7dyRRAKirp6dYBDX0iJSEGxvh2qRwLCKZP46CyW_NQw_pJDMTH" alt="">
+          <h4 class="center white-text">LOGIN</h4><br>
+        </div>
+        <div class="card-content grey darken-2">
+          <div class="row">
+            <div class="col s12 m12">
+              <form class="col s12" action="/api/v1/user/login/?src='web'" method="POST">
+                <div class="card-content white-text">
+                  <div class="row">
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">email</i>
+                      <input id="icon_prefix" type="text" class="validate white-text" name="email" required>
+                      <label for="icon_prefix" class="white-text">Email</label>
+                    </div>
+                    <div class="input-field col s12">
+                      <i class="material-icons prefix">lock</i>
+                      <input id="icon_prefix" type="password" class="validate white-text" name="password" required>
+                      <label for="icon_prefix" class="white-text">Password</label>
+                    </div>
+                  </div>
+                </div>
+                  <div class="row">
+                    <div class="col s2"></div>
+                    <button class="btn waves-effect waves-light btn-large col s8" type="submit" name="action">LOGIN
+                      <i class="material-icons right">lock_open</i>
+                    </button>
+                    <div class="col s2"></div>
+                  </div>
+                  <div class="row">
+                    <div class="col s2"></div>
+                      <a class="btn waves-effect waves-light btn-large col s8" href="/registerpage">REGISTER<i class="material-icons right">person_add</i></a>
+                    <div class="col s2"></div>
+                  </div>
+            </form>
+            </div>
           </div>
-          <form class="col s12" action="/api/v1/user/login/?src='web'" method="POST">
-            <div class="row">
-              <div class="input-field col s12">
-                <i class="material-icons prefix">email</i>
-                <input id="icon_prefix" type="text" class="validate white-text" name="email" required>
-                <label for="icon_prefix">Email</label>
-              </div>
-              <div class="input-field col s12">
-                <i class="material-icons prefix">lock</i>
-                <input id="icon_prefix" type="password" class="validate white-text" name="password" required>
-                <label for="icon_prefix">Password</label>
-              </div>
-            </div>
-            <div class="row">
-              <div class="col s2"></div>
-              <button class="btn waves-effect waves-light btn-large col s8" type="submit" name="action">LOGIN
-                <i class="material-icons right">lock_open</i>
-              </button>
-              <div class="col s2"></div>
-            </div>
-            <div class="row">
-              <div class="col s2"></div>
-                <a class="btn waves-effect waves-light btn-large col s8" href="/registerpage">REGISTER<i class="material-icons right">person_add</i></a>
-              <div class="col s2"></div>
-            </div>
-          </form>
-          <div class="col s12" style="height: 100px;"></div>
         </div>
       </div>
     </div>
-    <div class="col s4"></div>
+    <div class="col s12 m3 l3"></div>
   </div>
 </div>
 <%- include("partials/footer") %>
