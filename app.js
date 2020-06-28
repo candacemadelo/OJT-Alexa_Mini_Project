@@ -63,7 +63,7 @@ app.get('/registerpage', function(req, res) {
 });
 
 //Login Page
-app.post('/api/v1/user/login/:src', async (req, res) => {
+app.post('/api/v1/user/login', async (req, res) => {
 
   console.log(req);
   try {
@@ -136,8 +136,8 @@ app.post('/api/v1/user/login/:src', async (req, res) => {
 		const getTokenID = "" + token;
 		const data = await Devices.find({"userId": getUserID}, {"_id":0, "endpointId": 1, "description": 1, "manufacturerName":1, "friendlyName":1, "temperature":1,
 										"power_status":1, "mode":1, "tokenId":1, "endpointId": 1}).exec();
-		var src = req.params.src;
-		if(src == "web"){
+										
+		if(req.query.src == "web"){
 			res.render('home', {datas: data, token: getTokenID});
 		} else{
 			res.json({
@@ -504,9 +504,10 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var thermostatMode = data[i].mode;
 			var temperature = data[i].temperature;
 			var powerState = data[i].power_status;
+		}
 
-			context.push({	
-				"properties": [
+		res.status(201).json({
+			"properties": [
 		            {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
@@ -551,12 +552,6 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "uncertaintyInMilliseconds": 0
 		            }
 		        ]
-			});
-		}
-
-
-		res.status(201).json({
-			context
 		});
 
 	} catch(err) {
