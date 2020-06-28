@@ -452,7 +452,7 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 		}
 
 		const getUserDevice = await Devices.findOneAndUpdate({"userId": getUser, "endpointId": getEndpoint}, {$set: {"power_status": savePow, 
-			                                           "temperature": saveTemp, "mode": saveMode}}, {returnNewDocument:true, new:true}).exec();
+			                                           "temperature": saveTemp, "mode": saveMode}}, {returnNewDocument:true}).exec();
 
 		console.log(getUserDevice);
 		const getdevice = "" + getUserDevice._id;
@@ -480,6 +480,7 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 //Get device status
 app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
+	
 	try{
 		var getToken    = req.query.token;
 		var getEndpoint = req.query.endpointId;
@@ -499,16 +500,15 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		console.log(data);
 		
 		var timeNow = new Date().toISOString();
-		var context = [];
+		var properties = [];
 		for(i = 0; i < data.length; i++) {
 			var thermostatMode = data[i].mode;
 			var temperature = data[i].temperature;
 			var powerState = data[i].power_status;
-		}
 
-		res.status(201).json({
-			"properties": [
-		            {
+			properties.push(
+				
+				   {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
 		                "value": thermostatMode,
@@ -551,9 +551,17 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "timeOfSample": timeNow,
 		                "uncertaintyInMilliseconds": 0
 		            }
-		        ]
+		        
+			);
+		}
+
+		console.log(properties);
+
+		res.status(201).json({
+			properties
 		});
 
+		
 	} catch(err) {
 
 		console.log(err);
