@@ -399,8 +399,8 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 //Command Control API
 app.post("/api/v1/device/commandControl", async (req, res) => {
 
+	//console.log(req);
 	console.log(req);
-
 	try {
 
 		const getDevToken = req.body.tokenId;
@@ -420,10 +420,10 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 		}
 
 		const getUser = "" + userDev;
-		console.log(getUser);
+		//console.log(getUser);
 
 		const searchDevice = await Devices.find({"userId": getUser, "endpointId": getEndpoint}, {"_id": 0, "power_status": 1, "temperature":1, "mode":1}).exec();
-		console.log(searchDevice);
+		//console.log(searchDevice);
 
 		for(var i = 0; i < searchDevice.length; i++) {
 			var pow = searchDevice[i].power_status;
@@ -454,10 +454,10 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 		const getUserDevice = await Devices.findOneAndUpdate({"userId": getUser, "endpointId": getEndpoint}, {$set: {"power_status": savePow, 
 			                                           "temperature": saveTemp, "mode": saveMode}}, {returnNewDocument:true}).exec();
 
-		console.log(getUserDevice);
+		//console.log(getUserDevice);
 		const getdevice = "" + getUserDevice._id;
 		var device = await Devices.find({"_id": getdevice}, {}).exec();
-		console.log(device);
+		//console.log(device);
 	
 
 		res.status(201).json({
@@ -480,7 +480,7 @@ app.post("/api/v1/device/commandControl", async (req, res) => {
 //Get device status
 app.get("/api/v1/device/getStates", async (req, res) => {
 	console.log(req);
-	
+
 	try{
 		var getToken    = req.query.token;
 		var getEndpoint = req.query.endpointId;
@@ -507,7 +507,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 			var powerState = data[i].power_status;
 
 			properties.push(
-				
+				[
 				   {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
@@ -551,6 +551,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		                "timeOfSample": timeNow,
 		                "uncertaintyInMilliseconds": 0
 		            }
+		        ]
 		        
 			);
 		}
