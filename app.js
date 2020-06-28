@@ -400,7 +400,7 @@ app.get("/api/v1/device/getDevice", async (req, res) => {
 app.post("/api/v1/device/commandControl", async (req, res) => {
 
 	//console.log(req);
-	console.log(req);
+	console.log("HELLO" + JSON.stringify(req.body));
 	try {
 
 		const getDevToken = req.body.tokenId;
@@ -504,10 +504,9 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 		for(i = 0; i < data.length; i++) {
 			var thermostatMode = data[i].mode;
 			var temperature = data[i].temperature;
-			var powerState = data[i].power_status;
+			var powerState = (data[i].power_status == 1) ? "ON" : "OFF";
 
 			properties.push(
-				[
 				   {
 		                "namespace": "Alexa.ThermostatController",
 		                "name": "thermostatMode",
@@ -533,7 +532,7 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 				          "scale": "CELSIUS"
 				        },
 				        "timeOfSample": timeNow,
-				        "uncertaintyInMilliseconds": 1000
+				        "uncertaintyInMilliseconds": 500
 			        },
 		            {
 				        "namespace": "Alexa.EndpointHealth",
@@ -542,17 +541,15 @@ app.get("/api/v1/device/getStates", async (req, res) => {
 				          "value": "OK"
 				        },
 				        "timeOfSample":  timeNow,
-				        "uncertaintyInMilliseconds": 0
+				        "uncertaintyInMilliseconds": 500
 		            },
 		            {
 		                "namespace": "Alexa.PowerController",
 		                "name": "powerState",
 		                "value": powerState,
 		                "timeOfSample": timeNow,
-		                "uncertaintyInMilliseconds": 0
+		                "uncertaintyInMilliseconds": 500
 		            }
-		        ]
-		        
 			);
 		}
 
