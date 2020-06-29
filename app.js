@@ -139,7 +139,6 @@ app.post('/api/v1/user/login/', async (req, res) => {
 		
 		var src = req.query.src;
 
-		console.log(src);
 		if(src == "web"){
 			res.render('home', {datas: data, token: getTokenID});
 		} else{
